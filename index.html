@@ -34,9 +34,13 @@
     .category-chip.active { background-color: black; color: white; }
     .category-chip.inactive { background-color: #e5e7eb; color: #374151; }
 
-    /* แก้ปัญหา Modal Tailwind */
+    /* Modal */
     #loginModal { display: none; }
     #loginModal.active { display: flex !important; }
+    
+    /* ซ่อนลูกศรในช่องกรอกตัวเลข PIN */
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
   </style>
 </head>
 <body class="bg-gray-100" onload="fetchProducts()">
@@ -46,35 +50,63 @@
         <button onclick="toggleSidebar()" class="text-white hover:text-gray-300 focus:outline-none z-10">
             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
         </button>
-        
         <h1 class="text-xl md:text-2xl font-bold tracking-widest uppercase absolute left-1/2 transform -translate-x-1/2">HighClass</h1>
-        
         <div class="z-10">
-            <button id="navLoginBtn" onclick="openLoginModal()" class="text-xs md:text-sm font-bold bg-white text-black px-4 py-1.5 rounded-full hover:bg-gray-200 transition shadow">
-              เข้าสู่ระบบ
-            </button>
+            <button id="navLoginBtn" onclick="openLoginModal()" class="text-xs md:text-sm font-bold bg-white text-black px-4 py-1.5 rounded-full hover:bg-gray-200 transition shadow">เข้าสู่ระบบ</button>
             <div id="navUserBtn" class="hidden flex items-center gap-2 cursor-pointer hover:opacity-80 transition" onclick="navTo('profileSection')">
                 <span id="navPoints" class="text-xs md:text-sm font-bold text-yellow-400 drop-shadow">0 Pts</span>
-                <img id="navPic" src="" class="w-8 h-8 rounded-full border-2 border-white object-cover">
+                <img id="navPic" src="" class="w-8 h-8 rounded-full border-2 border-white object-cover bg-white">
             </div>
         </div>
     </div>
   </nav>
 
   <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-70 z-[9999] items-center justify-center p-4 backdrop-blur-sm">
-    <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md text-center relative border border-gray-100">
+    <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md text-center relative border border-gray-100 overflow-hidden">
       <button onclick="closeLoginModal()" class="absolute top-4 right-5 text-3xl font-bold text-gray-400 hover:text-red-500 transition leading-none">&times;</button>
       
-      <h2 class="text-3xl font-bold tracking-widest uppercase mb-2 text-black mt-2">HighClass</h2>
-      <p class="text-gray-500 font-medium mb-6">เข้าสู่ระบบเพื่อเช็คพอยต์และรับสิทธิพิเศษ</p>
+      <h2 class="text-3xl font-bold tracking-widest uppercase text-black mt-2">HighClass</h2>
       
-      <div class="text-left mb-5">
-        <label class="block text-sm font-bold text-gray-700 mb-2">เบอร์โทรศัพท์มือถือ</label>
-        <input type="text" id="phoneInput" class="w-full p-4 border-2 border-gray-200 rounded-2xl font-bold text-xl text-center focus:border-black focus:outline-none transition" placeholder="08X-XXX-XXXX">
+      <div id="formLogin">
+        <p class="text-gray-500 font-medium mb-6 mt-1">เข้าสู่ระบบเพื่อรับสิทธิพิเศษ</p>
+        <div class="text-left mb-4">
+          <label class="block text-sm font-bold text-gray-700 mb-2">เบอร์โทรศัพท์มือถือ</label>
+          <input type="text" id="loginPhone" class="w-full p-4 border-2 border-gray-200 rounded-2xl font-bold text-lg text-center focus:border-black focus:outline-none transition" placeholder="08X-XXX-XXXX">
+        </div>
+        <div class="text-left mb-6">
+          <label class="block text-sm font-bold text-gray-700 mb-2">รหัส PIN 4 หลัก</label>
+          <input type="password" id="loginPin" maxlength="4" inputmode="numeric" class="w-full p-4 border-2 border-gray-200 rounded-2xl font-bold text-2xl tracking-widest text-center focus:border-black focus:outline-none transition" placeholder="••••">
+        </div>
+        <button id="loginBtn" class="w-full bg-black text-white font-bold py-4 rounded-2xl hover:bg-gray-800 transition shadow-lg text-lg" onclick="loginSystem()">เข้าสู่ระบบ</button>
+        <p id="loginError" class="text-red-500 font-semibold text-sm mt-3 hidden"></p>
+        <div class="mt-5 pt-4 border-t border-gray-100">
+          <span class="text-gray-500 text-sm">ยังไม่มีบัญชี? </span>
+          <button onclick="switchForm('register')" class="text-black font-bold hover:underline">สมัครสมาชิกที่นี่</button>
+        </div>
       </div>
-      
-      <button id="loginBtn" class="w-full bg-black text-white font-bold py-4 rounded-2xl hover:bg-gray-800 transition shadow-lg text-lg" onclick="loginSystem()">เข้าสู่ระบบ</button>
-      <p id="loginError" class="text-red-500 font-semibold text-sm mt-4 hidden"></p>
+
+      <div id="formRegister" class="hidden">
+        <p class="text-black font-bold mb-4 mt-1">สมัครสมาชิกใหม่</p>
+        <div class="text-left mb-3">
+          <label class="block text-xs font-bold text-gray-700 mb-1">ชื่อเรียก / ชื่อเล่น</label>
+          <input type="text" id="regName" class="w-full p-3 border-2 border-gray-200 rounded-xl font-bold text-center focus:border-black focus:outline-none transition" placeholder="ใส่ชื่อของคุณ">
+        </div>
+        <div class="text-left mb-3">
+          <label class="block text-xs font-bold text-gray-700 mb-1">เบอร์โทรศัพท์มือถือ (ใช้เป็น ID)</label>
+          <input type="text" id="regPhone" class="w-full p-3 border-2 border-gray-200 rounded-xl font-bold text-center focus:border-black focus:outline-none transition" placeholder="08X-XXX-XXXX">
+        </div>
+        <div class="text-left mb-5">
+          <label class="block text-xs font-bold text-gray-700 mb-1">ตั้งรหัส PIN 4 หลัก (เพื่อเข้าสู่ระบบ)</label>
+          <input type="password" id="regPin" maxlength="4" inputmode="numeric" class="w-full p-3 border-2 border-gray-200 rounded-xl font-bold text-2xl tracking-widest text-center focus:border-black focus:outline-none transition" placeholder="••••">
+        </div>
+        <button id="regBtn" class="w-full bg-green-500 text-white font-bold py-3 rounded-xl hover:bg-green-600 transition shadow-md text-lg" onclick="registerSystem()">ยืนยันการสมัคร</button>
+        <p id="regError" class="text-red-500 font-semibold text-sm mt-3 hidden"></p>
+        <div class="mt-4 pt-4 border-t border-gray-100">
+          <span class="text-gray-500 text-sm">มีบัญชีอยู่แล้ว? </span>
+          <button onclick="switchForm('login')" class="text-black font-bold hover:underline">กลับไปเข้าสู่ระบบ</button>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -187,8 +219,8 @@
   </div>
 
   <script>
-    // ⚠️ 1. API ของระบบแต้ม (อย่าลืมใส่) ⚠️
-    const POINT_API_URL = 'https://script.google.com/macros/s/AKfycbyr2h8yvpol2hQ5U16LeHX0dRUleIiTvYGHz4mZi2BVWyOeUney-_qGN0WQwwCwfxvM/exec'; 
+    // ⚠️ 1. API ของระบบแต้ม ⚠️
+    const POINT_API_URL = 'https://script.google.com/macros/s/AKfycbzW-ORreNuwz4O5pQctRiimY8vovFKMc7oLM8GT_6Yu1dmuG9vjPIgBlWbji8IQf9cy/exec'; 
     // ✅ 2. API ของระบบ Stock
     const STOCK_API_URL = 'https://script.google.com/macros/s/AKfycbzVNx8UdaJFuzdXq4SCPNHoDHWb33-37djx4UBaH2UxwXWNIlEEtRpS3RlgnnuPN7QI/exec';
 
@@ -208,27 +240,84 @@
       if(document.getElementById('sidebar').classList.contains('active')) toggleSidebar();
     }
 
+    /* ================= ระบบสลับฟอร์ม (Login / Register) ================= */
+    function switchForm(formType) {
+      document.getElementById('loginError').classList.add('hidden');
+      document.getElementById('regError').classList.add('hidden');
+      if(formType === 'register') {
+        document.getElementById('formLogin').classList.add('hidden');
+        document.getElementById('formRegister').classList.remove('hidden');
+      } else {
+        document.getElementById('formRegister').classList.add('hidden');
+        document.getElementById('formLogin').classList.remove('hidden');
+      }
+    }
+
     /* ================= ระบบ Login Modal ================= */
     function openLoginModal() {
       document.getElementById('loginModal').classList.add('active');
+      switchForm('login'); // เปิดมาให้เจอหน้า Login เสมอ
     }
 
     function closeLoginModal() {
       document.getElementById('loginModal').classList.remove('active');
-      document.getElementById('loginError').classList.add('hidden');
-      document.getElementById('phoneInput').value = '';
+      document.getElementById('loginPhone').value = '';
+      document.getElementById('loginPin').value = '';
+      document.getElementById('regName').value = '';
+      document.getElementById('regPhone').value = '';
+      document.getElementById('regPin').value = '';
+    }
+
+    async function registerSystem() {
+      const name = document.getElementById('regName').value.trim();
+      const phone = document.getElementById('regPhone').value.trim();
+      const pin = document.getElementById('regPin').value.trim();
+      const errorText = document.getElementById('regError');
+      const btn = document.getElementById('regBtn');
+
+      if(!name || !phone || !pin) {
+        errorText.innerText = 'กรุณากรอกข้อมูลให้ครบถ้วนครับ';
+        errorText.classList.remove('hidden'); return;
+      }
+      if(pin.length !== 4) {
+        errorText.innerText = 'รหัส PIN ต้องเป็นตัวเลข 4 หลักครับ';
+        errorText.classList.remove('hidden'); return;
+      }
+
+      btn.innerText = 'กำลังสมัคร...'; btn.disabled = true; errorText.classList.add('hidden');
+      try {
+        const response = await fetch(`${POINT_API_URL}?action=register&phone=${phone}&name=${encodeURIComponent(name)}&pin=${pin}`);
+        const data = await response.json();
+        
+        if (data.success) {
+          alert('สมัครสมาชิกสำเร็จ! กำลังเข้าสู่ระบบให้ทันทีครับ');
+          // ให้เข้าสู่ระบบอัตโนมัติ
+          document.getElementById('loginPhone').value = phone;
+          document.getElementById('loginPin').value = pin;
+          loginSystem();
+        } else {
+          errorText.innerText = data.message;
+          errorText.classList.remove('hidden');
+        }
+      } catch (error) {
+        errorText.innerText = 'เชื่อมต่อไม่สำเร็จ ลองกด Deploy ใหม่นะครับ';
+        errorText.classList.remove('hidden');
+      } finally {
+        btn.innerText = 'ยืนยันการสมัคร'; btn.disabled = false;
+      }
     }
 
     async function loginSystem() {
-      const phone = document.getElementById('phoneInput').value.trim();
+      const phone = document.getElementById('loginPhone').value.trim();
+      const pin = document.getElementById('loginPin').value.trim();
       if(!phone) return;
 
       const btn = document.getElementById('loginBtn');
       const errorText = document.getElementById('loginError');
-      btn.innerText = 'กำลังตรวจสอบ...'; btn.disabled = true;
+      btn.innerText = 'กำลังตรวจสอบ...'; btn.disabled = true; errorText.classList.add('hidden');
       
       try {
-        const response = await fetch(`${POINT_API_URL}?action=login&phone=${phone}`);
+        const response = await fetch(`${POINT_API_URL}?action=login&phone=${phone}&pin=${pin}`);
         const data = await response.json();
         
         if (data.success) {
@@ -265,13 +354,13 @@
           } else {
              rankElement.style.color = '#fff';
           }
-
+          navTo('profileSection');
         } else {
           errorText.innerText = data.message;
           errorText.classList.remove('hidden');
         }
       } catch (error) {
-        errorText.innerText = 'เกิดข้อผิดพลาดในการเชื่อมต่อ';
+        errorText.innerText = 'เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่ครับ';
         errorText.classList.remove('hidden');
       } finally {
         btn.innerText = 'เข้าสู่ระบบ'; btn.disabled = false;
@@ -293,33 +382,23 @@
       const displayDiv = document.getElementById('userNameDisplay');
       const editDiv = document.getElementById('nameEditDiv');
       if (editDiv.classList.contains('hidden')) {
-        displayDiv.classList.add('hidden');
-        editDiv.classList.remove('hidden');
-        editDiv.classList.add('flex');
+        displayDiv.classList.add('hidden'); editDiv.classList.remove('hidden'); editDiv.classList.add('flex');
       } else {
-        displayDiv.classList.remove('hidden');
-        editDiv.classList.add('hidden');
-        editDiv.classList.remove('flex');
+        displayDiv.classList.remove('hidden'); editDiv.classList.add('hidden'); editDiv.classList.remove('flex');
       }
     }
 
     async function saveName() {
       const newName = document.getElementById('editNameInput').value.trim();
       if(!newName) return;
-      
-      const btn = document.getElementById('saveNameBtn');
-      btn.innerText = 'รอ...'; btn.disabled = true;
+      const btn = document.getElementById('saveNameBtn'); btn.innerText = 'รอ...'; btn.disabled = true;
 
       try {
         const response = await fetch(POINT_API_URL, {
-          method: 'POST',
-          body: JSON.stringify({ action: 'updateProfile', phone: currentUserPhone, newName: newName, currentPic: currentProfilePic })
+          method: 'POST', body: JSON.stringify({ action: 'updateProfile', phone: currentUserPhone, newName: newName, currentPic: currentProfilePic })
         });
         const data = await response.json();
-        if(data.success) {
-          document.getElementById('userNameDisplay').innerText = data.newName;
-          toggleEditName();
-        }
+        if(data.success) { document.getElementById('userNameDisplay').innerText = data.newName; toggleEditName(); }
       } catch (err) { alert('อัปเดตชื่อไม่สำเร็จ'); }
       btn.innerText = 'บันทึก'; btn.disabled = false;
     }
@@ -332,11 +411,9 @@
       reader.onload = async function(e) {
         document.getElementById('userPic').src = e.target.result;
         document.getElementById('navPic').src = e.target.result;
-        
         try {
            const response = await fetch(POINT_API_URL, {
-             method: 'POST',
-             body: JSON.stringify({ action: 'updateProfile', phone: currentUserPhone, base64Image: e.target.result, mimeType: file.type, currentPic: currentProfilePic })
+             method: 'POST', body: JSON.stringify({ action: 'updateProfile', phone: currentUserPhone, base64Image: e.target.result, mimeType: file.type, currentPic: currentProfilePic })
            });
            const data = await response.json();
            if(data.success) currentProfilePic = data.newPic;
