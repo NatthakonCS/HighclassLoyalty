@@ -38,7 +38,6 @@
     #loginModal { display: none; }
     #loginModal.active { display: flex !important; }
     
-    /* ซ่อนลูกศรในช่องกรอกตัวเลข PIN */
     input[type=number]::-webkit-inner-spin-button, 
     input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
   </style>
@@ -61,7 +60,7 @@
     </div>
   </nav>
 
-  <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-70 z-[9999] items-center justify-center p-4 backdrop-blur-sm">
+  <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-70 z-[9999] items-center justify-center p-4 backdrop-blur-sm transition-opacity">
     <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md text-center relative border border-gray-100 overflow-hidden">
       <button onclick="closeLoginModal()" class="absolute top-4 right-5 text-3xl font-bold text-gray-400 hover:text-red-500 transition leading-none">&times;</button>
       
@@ -120,7 +119,8 @@
       </div>
       <ul class="sidebar-menu">
         <li onclick="navTo('stockSection')">👕 สินค้าพร้อมส่ง</li>
-        <li onclick="navTo('activitiesSection')">🎉 กิจกรรมพิเศษ</li>
+        <li onclick="navTo('privilegeSection')">👑 สิทธิพิเศษ</li> <li onclick="navTo('activitiesSection')">🎉 กิจกรรมพิเศษ</li>
+        
         <li id="menuProfile" class="hidden" onclick="navTo('profileSection')">👤 โปรไฟล์สมาชิก</li>
         <li id="menuRewards" class="hidden" onclick="navTo('rewardsSection')">🎁 แลกของรางวัล</li>
         <li id="menuLogout" class="logout hidden" onclick="logoutSystem()">🚪 ออกจากระบบ</li>
@@ -136,16 +136,77 @@
             <p class="text-gray-500 text-sm font-medium">เลือกดูสินค้าที่ยังมีในสต๊อก</p>
           </div>
         </div>
-
         <div class="flex gap-2 mb-6 overflow-x-auto pb-2 hide-scroll" id="category-container">
           <button onclick="filterStock('ทั้งหมด', this)" class="category-chip active">ทั้งหมด</button>
           <button onclick="filterStock('เสื้อฮู้ด', this)" class="category-chip inactive">เสื้อฮู้ด</button>
           <button onclick="filterStock('เสื้อ T-shirt', this)" class="category-chip inactive">เสื้อ T-shirt</button>
           <button onclick="filterStock('โปโล', this)" class="category-chip inactive">โปโล</button>
         </div>
-
         <div id="stock-loading" class="text-center py-10 font-medium text-gray-400">กำลังโหลดรายการสินค้า...</div>
         <div id="product-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6"></div>
+      </div>
+
+      <div id="privilegeSection" class="section">
+        <div class="mb-6">
+          <h2 class="text-2xl font-bold text-black">สิทธิพิเศษ</h2>
+          <p class="text-gray-500 text-sm font-medium">รายละเอียดการสะสมพอยต์และระดับสมาชิก</p>
+        </div>
+
+        <div class="bg-black text-white p-6 rounded-3xl shadow-lg mb-8 flex items-center gap-5 relative overflow-hidden">
+          <div class="absolute -right-4 -top-6 opacity-10 text-8xl">🛍️</div>
+          <div class="text-5xl drop-shadow-md z-10">💎</div>
+          <div class="z-10">
+            <h3 class="text-lg font-bold tracking-wide">กติกาการสะสมพอยต์</h3>
+            <p class="text-sm text-gray-300 mt-1 leading-relaxed">
+              ยอดสั่งซื้อทุกๆ <span class="text-yellow-400 font-bold text-lg mx-1">200 บาท</span> รับทันที <span class="text-yellow-400 font-bold text-lg mx-1">1 High Point</span>
+            </p>
+            <p class="text-xs text-gray-400 mt-2 bg-gray-800 bg-opacity-50 inline-block px-2 py-1 rounded">
+              * ระบบจะปัดเศษขึ้นให้เสมอ (เช่น 390 บาท = 2 พอยต์)
+            </p>
+          </div>
+        </div>
+
+        <h3 class="text-xl font-bold text-black mb-4">ระดับสมาชิก (Rank)</h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          
+          <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4 hover:shadow-md transition">
+            <div class="w-14 h-14 rounded-full flex items-center justify-center text-2xl shadow-inner border-2 border-white" style="background-color: #8B4513; color: white;">🤎</div>
+            <div>
+              <div class="font-bold text-gray-800 text-lg">ผู้ผ่านทาง</div>
+              <div class="text-sm font-medium text-gray-500">สะสม 0 - 1 Point</div>
+            </div>
+          </div>
+
+          <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4 hover:shadow-md transition">
+            <div class="w-14 h-14 rounded-full flex items-center justify-center text-2xl shadow-inner border-2 border-white" style="background-color: #C0C0C0; color: black;">🥈</div>
+            <div>
+              <div class="font-bold text-gray-800 text-lg">เสื้อผ้าร้านนี้แอบเลิศ</div>
+              <div class="text-sm font-medium text-gray-500">สะสม 2 - 4 Point</div>
+            </div>
+          </div>
+
+          <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4 hover:shadow-md transition">
+            <div class="w-14 h-14 rounded-full flex items-center justify-center text-2xl shadow-inner border-2 border-white" style="background-color: #FFD700; color: black;">🥇</div>
+            <div>
+              <div class="font-bold text-gray-800 text-lg">ลูกค้าประจำ</div>
+              <div class="text-sm font-medium text-gray-500">สะสม 5 - 8 Point</div>
+            </div>
+          </div>
+
+          <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4 hover:shadow-md transition">
+            <div class="w-14 h-14 rounded-full flex items-center justify-center text-2xl shadow-inner border-2 border-white" style="background-color: #FF0000; color: white;">👑</div>
+            <div>
+              <div class="font-bold text-gray-800 text-lg">ผู้สนับสนุนรายใหญ่</div>
+              <div class="text-sm font-medium text-gray-500">สะสม 9 - 10+ Point</div>
+            </div>
+          </div>
+
+        </div>
+        
+        <div id="promoRegisterBtn" class="mt-8 text-center">
+           <button onclick="openLoginModal(); switchForm('register');" class="bg-black text-white font-bold py-3 px-8 rounded-full hover:bg-gray-800 shadow-lg transition">สมัครสมาชิกฟรี 🚀</button>
+        </div>
       </div>
 
       <div id="activitiesSection" class="section">
@@ -253,10 +314,9 @@
       }
     }
 
-    /* ================= ระบบ Login Modal ================= */
     function openLoginModal() {
       document.getElementById('loginModal').classList.add('active');
-      switchForm('login'); // เปิดมาให้เจอหน้า Login เสมอ
+      switchForm('login');
     }
 
     function closeLoginModal() {
@@ -268,6 +328,7 @@
       document.getElementById('regPin').value = '';
     }
 
+    /* ================= สมัครสมาชิก ================= */
     async function registerSystem() {
       const name = document.getElementById('regName').value.trim();
       const phone = document.getElementById('regPhone').value.trim();
@@ -275,14 +336,8 @@
       const errorText = document.getElementById('regError');
       const btn = document.getElementById('regBtn');
 
-      if(!name || !phone || !pin) {
-        errorText.innerText = 'กรุณากรอกข้อมูลให้ครบถ้วนครับ';
-        errorText.classList.remove('hidden'); return;
-      }
-      if(pin.length !== 4) {
-        errorText.innerText = 'รหัส PIN ต้องเป็นตัวเลข 4 หลักครับ';
-        errorText.classList.remove('hidden'); return;
-      }
+      if(!name || !phone || !pin) { errorText.innerText = 'กรุณากรอกข้อมูลให้ครบถ้วนครับ'; errorText.classList.remove('hidden'); return; }
+      if(pin.length !== 4) { errorText.innerText = 'รหัส PIN ต้องเป็นตัวเลข 4 หลักครับ'; errorText.classList.remove('hidden'); return; }
 
       btn.innerText = 'กำลังสมัคร...'; btn.disabled = true; errorText.classList.add('hidden');
       try {
@@ -291,22 +346,14 @@
         
         if (data.success) {
           alert('สมัครสมาชิกสำเร็จ! กำลังเข้าสู่ระบบให้ทันทีครับ');
-          // ให้เข้าสู่ระบบอัตโนมัติ
-          document.getElementById('loginPhone').value = phone;
-          document.getElementById('loginPin').value = pin;
+          document.getElementById('loginPhone').value = phone; document.getElementById('loginPin').value = pin;
           loginSystem();
-        } else {
-          errorText.innerText = data.message;
-          errorText.classList.remove('hidden');
-        }
-      } catch (error) {
-        errorText.innerText = 'เชื่อมต่อไม่สำเร็จ ลองกด Deploy ใหม่นะครับ';
-        errorText.classList.remove('hidden');
-      } finally {
-        btn.innerText = 'ยืนยันการสมัคร'; btn.disabled = false;
-      }
+        } else { errorText.innerText = data.message; errorText.classList.remove('hidden'); }
+      } catch (error) { errorText.innerText = 'เชื่อมต่อไม่สำเร็จ ลองกด Deploy ใหม่นะครับ'; errorText.classList.remove('hidden'); } 
+      finally { btn.innerText = 'ยืนยันการสมัคร'; btn.disabled = false; }
     }
 
+    /* ================= เข้าสู่ระบบ ================= */
     async function loginSystem() {
       const phone = document.getElementById('loginPhone').value.trim();
       const pin = document.getElementById('loginPin').value.trim();
@@ -330,6 +377,9 @@
           document.getElementById('navUserBtn').classList.remove('hidden');
           document.getElementById('navPoints').innerText = data.currentPoints + " Pts";
           
+          // ซ่อนปุ่มโปรโมทให้สมัครสมาชิกในหน้าสิทธิพิเศษ เพราะล็อคอินแล้ว
+          document.getElementById('promoRegisterBtn').classList.add('hidden');
+          
           document.getElementById('menuProfile').classList.remove('hidden');
           document.getElementById('menuRewards').classList.remove('hidden');
           document.getElementById('menuLogout').classList.remove('hidden');
@@ -349,28 +399,22 @@
           const rankElement = document.getElementById('userRank');
           rankElement.innerText = "Rank : " + data.rank.name;
           rankElement.style.backgroundColor = data.rank.color;
-          if(data.rank.color === '#C0C0C0' || data.rank.color === '#FFD700') {
-             rankElement.style.color = '#000'; 
-          } else {
-             rankElement.style.color = '#fff';
-          }
+          if(data.rank.color === '#C0C0C0' || data.rank.color === '#FFD700') rankElement.style.color = '#000'; 
+          else rankElement.style.color = '#fff';
+          
           navTo('profileSection');
-        } else {
-          errorText.innerText = data.message;
-          errorText.classList.remove('hidden');
-        }
-      } catch (error) {
-        errorText.innerText = 'เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่ครับ';
-        errorText.classList.remove('hidden');
-      } finally {
-        btn.innerText = 'เข้าสู่ระบบ'; btn.disabled = false;
-      }
+        } else { errorText.innerText = data.message; errorText.classList.remove('hidden'); }
+      } catch (error) { errorText.innerText = 'เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่ครับ'; errorText.classList.remove('hidden'); } 
+      finally { btn.innerText = 'เข้าสู่ระบบ'; btn.disabled = false; }
     }
 
     function logoutSystem() {
       currentUserPhone = '';
       document.getElementById('navLoginBtn').classList.remove('hidden');
       document.getElementById('navUserBtn').classList.add('hidden');
+      
+      document.getElementById('promoRegisterBtn').classList.remove('hidden'); // โชว์ปุ่มโปรโมทอีกครั้ง
+
       document.getElementById('menuProfile').classList.add('hidden');
       document.getElementById('menuRewards').classList.add('hidden');
       document.getElementById('menuLogout').classList.add('hidden');
@@ -379,24 +423,17 @@
 
     /* ================= อัปเดตโปรไฟล์ ================= */
     function toggleEditName() {
-      const displayDiv = document.getElementById('userNameDisplay');
-      const editDiv = document.getElementById('nameEditDiv');
-      if (editDiv.classList.contains('hidden')) {
-        displayDiv.classList.add('hidden'); editDiv.classList.remove('hidden'); editDiv.classList.add('flex');
-      } else {
-        displayDiv.classList.remove('hidden'); editDiv.classList.add('hidden'); editDiv.classList.remove('flex');
-      }
+      const displayDiv = document.getElementById('userNameDisplay'); const editDiv = document.getElementById('nameEditDiv');
+      if (editDiv.classList.contains('hidden')) { displayDiv.classList.add('hidden'); editDiv.classList.remove('hidden'); editDiv.classList.add('flex'); } 
+      else { displayDiv.classList.remove('hidden'); editDiv.classList.add('hidden'); editDiv.classList.remove('flex'); }
     }
 
     async function saveName() {
       const newName = document.getElementById('editNameInput').value.trim();
       if(!newName) return;
       const btn = document.getElementById('saveNameBtn'); btn.innerText = 'รอ...'; btn.disabled = true;
-
       try {
-        const response = await fetch(POINT_API_URL, {
-          method: 'POST', body: JSON.stringify({ action: 'updateProfile', phone: currentUserPhone, newName: newName, currentPic: currentProfilePic })
-        });
+        const response = await fetch(POINT_API_URL, { method: 'POST', body: JSON.stringify({ action: 'updateProfile', phone: currentUserPhone, newName: newName, currentPic: currentProfilePic }) });
         const data = await response.json();
         if(data.success) { document.getElementById('userNameDisplay').innerText = data.newName; toggleEditName(); }
       } catch (err) { alert('อัปเดตชื่อไม่สำเร็จ'); }
@@ -406,15 +443,11 @@
     function previewAndSavePic(event) {
       const file = event.target.files[0];
       if (!file) return;
-
       const reader = new FileReader();
       reader.onload = async function(e) {
-        document.getElementById('userPic').src = e.target.result;
-        document.getElementById('navPic').src = e.target.result;
+        document.getElementById('userPic').src = e.target.result; document.getElementById('navPic').src = e.target.result;
         try {
-           const response = await fetch(POINT_API_URL, {
-             method: 'POST', body: JSON.stringify({ action: 'updateProfile', phone: currentUserPhone, base64Image: e.target.result, mimeType: file.type, currentPic: currentProfilePic })
-           });
+           const response = await fetch(POINT_API_URL, { method: 'POST', body: JSON.stringify({ action: 'updateProfile', phone: currentUserPhone, base64Image: e.target.result, mimeType: file.type, currentPic: currentProfilePic }) });
            const data = await response.json();
            if(data.success) currentProfilePic = data.newPic;
         } catch (err) {}
@@ -422,7 +455,7 @@
       reader.readAsDataURL(file);
     }
 
-    /* ================= แลกของรางวัล & ดึงสินค้า ================= */
+    /* ================= แลกของ & สินค้า ================= */
     async function redeemReward(itemName, cost) {
       if(confirm(`ยืนยันการใช้ ${cost} พอยต์ เพื่อแลก ${itemName}?`)) {
         try {
@@ -455,9 +488,7 @@
       }
       const grid = document.getElementById('product-grid');
       const filtered = cat === 'ทั้งหมด' ? allProducts : allProducts.filter(i => i.category === cat);
-      
       if(filtered.length === 0) { grid.innerHTML = '<p class="col-span-full text-center py-8 text-gray-500 font-medium">ไม่มีสินค้าในหมวดหมู่นี้</p>'; return; }
-      
       grid.innerHTML = filtered.map(item => `
         <div class="bg-white rounded-2xl shadow-sm flex flex-col border border-gray-100 overflow-hidden group">
           <img src="${item.image}" class="w-full h-48 md:h-56 object-cover group-hover:scale-105 transition duration-300">
