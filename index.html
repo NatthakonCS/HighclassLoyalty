@@ -436,7 +436,7 @@
       }
     }
 
-    // 6. ระบบสต๊อกสินค้า
+    // 6. ระบบสต๊อกสินค้า (อัปเดตให้กดสนใจสินค้าแล้วเด้งไปหน้าแชท IG)
     let allProducts = []; 
     async function fetchProducts() {
       if (allProducts.length > 0) return; 
@@ -457,8 +457,43 @@
             <h3 class="font-bold text-gray-800 text-sm md:text-base">${item.name}</h3>
             <p class="text-gray-500 text-xs mt-1 font-medium">Size: ${item.size}</p>
             <p class="text-black font-black text-lg mt-2 mb-4">฿${item.price}</p>
-            <button onclick="window.location.href='https://ig.me/m/highclass.2hand'" class="mt-auto block w-full bg-black hover:bg-gray-800 text-white text-center py-2 rounded-lg font-bold text-sm transition shadow-md">สนใจสินค้า</button>
+            <button onclick="contactShop('${item.name}', '${item.size}', '${item.price}')" class="mt-auto block w-full bg-black hover:bg-gray-800 text-white text-center py-2 rounded-lg font-bold text-sm transition shadow-md">สนใจสินค้า</button>
           </div></div>`).join('');
+    }
+
+    // ================= ระบบเด้งเข้าแอป IG + ก๊อปปี้สินค้าอัตโนมัติ =================
+    function contactShop(productName, productSize, productPrice) {
+        // 1. เตรียมข้อความ
+        const textToCopy = `สนใจสินค้าครับ/ค่ะ: ${productName}\\n(ไซส์: ${productSize}) ราคา ฿${productPrice}`;
+        
+        // 2. ก๊อปปี้ลงคลิปบอร์ด
+        const el = document.createElement('textarea');
+        el.value = textToCopy;
+        document.body.appendChild(el);
+        el.select();
+        try {
+            document.execCommand('copy');
+            alert('ก็อปปี้ข้อมูลสินค้าเรียบร้อย! 👕\\n\\nระบบกำลังพาไปที่ IG ร้าน ให้ลูกค้ากด "ข้อความ" แล้วกด "วาง" (Paste) เพื่อสอบถามได้เลยครับ');
+        } catch (e) {
+            alert('ระบบกำลังพาไปที่ IG ร้านครับ');
+        }
+        document.body.removeChild(el);
+
+        // 3. ระบบ Deep Link เปิด IG
+        const igUsername = 'highclass.2hand'; 
+        const ua = navigator.userAgent || navigator.vendor || window.opera;
+        const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+        const isAndroid = /android/i.test(ua);
+
+        if (isIOS) {
+            window.location.href = `instagram://user?username=${igUsername}`;
+            setTimeout(() => { window.location.href = `https://ig.me/m/${igUsername}`; }, 1500);
+        } else if (isAndroid) {
+            window.location.href = `intent://instagram.com/_u/${igUsername}/#Intent;package=com.instagram.android;scheme=https;end`;
+            setTimeout(() => { window.location.href = `https://ig.me/m/${igUsername}`; }, 1500);
+        } else {
+            window.open(`https://ig.me/m/${igUsername}`, '_blank');
+        }
     }
 
     // ================= 7. ระบบเช็คพัสดุ (ของเถ้าแก่ฟิว) =================
