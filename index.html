@@ -266,7 +266,7 @@
 
   <script>
     // ⚠️ ลิงก์ API ทั้ง 3 ตัว
-    const POINT_API_URL = 'https://script.google.com/macros/s/AKfycby8zYwwttLNwpEk61ObrBo8ZglKSc69neldkzNVIzb-XUizGqvyzGMuuHCQrh7CYBTf/exec'; 
+    const POINT_API_URL = 'https://script.google.com/macros/s/AKfycbzxLmh2Dq-id3pvvfNga5SGRPOkudw3IpmNJzZfPhCGp1rg089wOkEBDMcuwX5-5Tsz/exec'; 
     const STOCK_API_URL = 'https://script.google.com/macros/s/AKfycbzVNx8UdaJFuzdXq4SCPNHoDHWb33-37djx4UBaH2UxwXWNIlEEtRpS3RlgnnuPN7QI/exec';
     const TRACKING_API_URL = 'https://script.google.com/macros/s/AKfycbw49xoUL87wdRfP4dDfPwsZ7Y2yKqT8Gjb5BhhMXxlMDk9Z3fLKe6oGqgy_lG_Z3020/exec'; 
 
@@ -445,7 +445,7 @@
         document.getElementById('stock-loading').style.display = 'none'; filterStock('ทั้งหมด', document.querySelector('.category-chip'));
       } catch (error) { document.getElementById('stock-loading').innerText = 'ไม่สามารถโหลดข้อมูลสินค้าได้'; }
     }
-    function filterStock(cat, btnElement) {
+        function filterStock(cat, btnElement) {
       if(btnElement) { document.querySelectorAll('.category-chip').forEach(el => { el.classList.remove('active'); el.classList.add('inactive'); }); btnElement.classList.remove('inactive'); btnElement.classList.add('active'); }
       const grid = document.getElementById('product-grid');
       const filtered = cat === 'ทั้งหมด' ? allProducts : allProducts.filter(i => i.category === cat);
@@ -457,14 +457,14 @@
             <h3 class="font-bold text-gray-800 text-sm md:text-base">${item.name}</h3>
             <p class="text-gray-500 text-xs mt-1 font-medium">Size: ${item.size}</p>
             <p class="text-black font-black text-lg mt-2 mb-4">฿${item.price}</p>
-            <button onclick="contactShop('${item.name}', '${item.size}', '${item.price}')" class="mt-auto block w-full bg-black hover:bg-gray-800 text-white text-center py-2 rounded-lg font-bold text-sm transition shadow-md">สนใจสินค้า</button>
+            <button onclick="contactShop('${item.name}', '${item.size}', '${item.price}', '${item.image}')" class="mt-auto block w-full bg-[#00B900] hover:bg-[#009900] text-white text-center py-2 rounded-lg font-bold text-sm transition shadow-md">สั่งซื้อทาง LINE</button>
           </div></div>`).join('');
     }
 
-    // ================= ระบบเด้งเข้าแอป IG + ก๊อปปี้สินค้าอัตโนมัติ =================
-    function contactShop(productName, productSize, productPrice) {
-        // 1. เตรียมข้อความ
-        const textToCopy = `สนใจสินค้าครับ/ค่ะ: ${productName}\\n(ไซส์: ${productSize}) ราคา ฿${productPrice}`;
+      // ================= ระบบก๊อปปี้ข้อความ + เด้งเข้าแอป LINE =================
+    function contactShop(productName, productSize, productPrice, productImage) {
+        // 1. เตรียมข้อความแพทเทิร์นเดิมของเถ้าแก่
+        const textToCopy = `สนใจสินค้าชิ้นนี้ครับ/ค่ะ\n👕 ชื่อ: ${productName}\n📏 ไซส์: ${productSize}\n💰 ราคา: ฿${productPrice}\n🖼 ดูรูปสินค้า: ${productImage}`;
         
         // 2. ก๊อปปี้ลงคลิปบอร์ด
         const el = document.createElement('textarea');
@@ -473,28 +473,16 @@
         el.select();
         try {
             document.execCommand('copy');
-            alert('ก็อปปี้ข้อมูลสินค้าเรียบร้อย! 👕\\n\\nระบบกำลังพาไปที่ IG ร้าน ให้ลูกค้ากด "ข้อความ" แล้วกด "วาง" (Paste) เพื่อสอบถามได้เลยครับ');
+            alert('คัดลอกข้อมูลสินค้าแล้ว! พอกด OK ระบบจะพาไปที่ LINE ให้กด "วาง (Paste)" ในแชทเพื่อสั่งซื้อได้เลยครับ');
         } catch (e) {
-            alert('ระบบกำลังพาไปที่ IG ร้านครับ');
+            alert('ระบบกำลังพาไปที่ LINE ร้านครับ');
         }
         document.body.removeChild(el);
 
-        // 3. ระบบ Deep Link เปิด IG
-        const igUsername = 'highclass.2hand'; 
-        const ua = navigator.userAgent || navigator.vendor || window.opera;
-        const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
-        const isAndroid = /android/i.test(ua);
-
-        if (isIOS) {
-            window.location.href = `instagram://user?username=${igUsername}`;
-            setTimeout(() => { window.location.href = `https://ig.me/m/${igUsername}`; }, 1500);
-        } else if (isAndroid) {
-            window.location.href = `intent://instagram.com/_u/${igUsername}/#Intent;package=com.instagram.android;scheme=https;end`;
-            setTimeout(() => { window.location.href = `https://ig.me/m/${igUsername}`; }, 1500);
-        } else {
-            window.open(`https://ig.me/m/${igUsername}`, '_blank');
-        }
+        // 3. ระบบพาเข้า LINE Official Account
+        window.location.href = 'https://line.me/ti/p/@709qllnp';
     }
+
 
     // ================= 7. ระบบเช็คพัสดุ (ของเถ้าแก่ฟิว) =================
     function toggleTrackMode() {
