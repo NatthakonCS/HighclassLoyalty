@@ -7,10 +7,8 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600;700&display=swap');
-    
     body { font-family: 'Prompt', sans-serif; background-color: #f3f4f6; margin: 0; overflow-x: hidden; }
     
-    /* Sidebar */
     .main-sidebar { width: 280px; background-color: white; position: fixed; top: 0; bottom: 0; left: -280px; transition: transform 0.3s ease-in-out; z-index: 9999; box-shadow: 4px 0 15px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
     .main-sidebar.active { transform: translateX(280px); }
     .sidebar-menu { list-style: none; padding: 0; margin: 0; flex-grow: 1; }
@@ -21,28 +19,22 @@
 
     .app-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9990; backdrop-filter: blur(2px); }
     .app-overlay.active { display: block; }
-
-    /* Sections */
     .section { display: none; padding: 20px; max-width: 1000px; margin: 0 auto; animation: fadeIn 0.4s ease; }
     .section.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
     .hide-scroll::-webkit-scrollbar { display: none; }
     .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
-    
     .category-chip { padding: 6px 16px; border-radius: 999px; font-size: 0.875rem; white-space: nowrap; cursor: pointer; transition: 0.2s; font-weight: 500; }
     .category-chip.active { background-color: black; color: white; }
     .category-chip.inactive { background-color: #e5e7eb; color: #374151; }
 
-    /* Modal */
     #loginModal { display: none; }
     #loginModal.active { display: flex !important; }
-    
-    input[type=number]::-webkit-inner-spin-button, 
-    input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
   </style>
 </head>
-<body class="bg-gray-100" onload="fetchProducts()">
+<body class="bg-gray-100" onload="initApp()">
 
   <nav id="topNavbar" class="bg-black text-white h-16 sticky top-0 z-40 w-full shadow-md">
     <div class="w-full h-full flex justify-between items-center px-4 max-w-6xl mx-auto relative">
@@ -63,7 +55,6 @@
   <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-70 z-[9999] items-center justify-center p-4 backdrop-blur-sm transition-opacity">
     <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md text-center relative border border-gray-100 overflow-hidden">
       <button onclick="closeLoginModal()" class="absolute top-4 right-5 text-3xl font-bold text-gray-400 hover:text-red-500 transition leading-none">&times;</button>
-      
       <h2 class="text-3xl font-bold tracking-widest uppercase text-black mt-2">HighClass</h2>
       
       <div id="formLogin">
@@ -105,13 +96,11 @@
           <button onclick="switchForm('login')" class="text-black font-bold hover:underline">กลับไปเข้าสู่ระบบ</button>
         </div>
       </div>
-
     </div>
   </div>
 
   <div id="appView">
     <div class="app-overlay" id="overlay" onclick="toggleSidebar()"></div>
-
     <div class="main-sidebar" id="sidebar">
       <div class="p-6 bg-black text-white flex justify-between items-center">
         <h2 class="text-xl font-bold tracking-widest uppercase">HighClass</h2>
@@ -119,6 +108,9 @@
       </div>
       <ul class="sidebar-menu">
         <li onclick="navTo('stockSection')">👕 สินค้าพร้อมส่ง</li>
+        
+        <li onclick="navTo('trackingSection')">📦 เช็คสถานะพัสดุ</li>
+        
         <li onclick="navTo('privilegeSection')">👑 สิทธิพิเศษ</li> 
         <li onclick="navTo('activitiesSection')">🎉 กิจกรรมพิเศษ</li>
         
@@ -132,10 +124,7 @@
       
       <div id="stockSection" class="section active">
         <div class="flex justify-between items-end mb-4">
-          <div>
-            <h2 class="text-2xl font-bold text-black">สินค้าพร้อมส่ง</h2>
-            <p class="text-gray-500 text-sm font-medium">เลือกดูสินค้าที่ยังมีในสต๊อก</p>
-          </div>
+          <div><h2 class="text-2xl font-bold text-black">สินค้าพร้อมส่ง</h2><p class="text-gray-500 text-sm font-medium">เลือกดูสินค้าที่ยังมีในสต๊อก</p></div>
         </div>
         <div class="flex gap-2 mb-6 overflow-x-auto pb-2 hide-scroll" id="category-container">
           <button onclick="filterStock('ทั้งหมด', this)" class="category-chip active">ทั้งหมด</button>
@@ -147,26 +136,27 @@
         <div id="product-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6"></div>
       </div>
 
-      <div id="privilegeSection" class="section">
-        <div class="mb-6">
-          <h2 class="text-2xl font-bold text-black">สิทธิพิเศษ</h2>
-          <p class="text-gray-500 text-sm font-medium">รายละเอียดการสะสมพอยต์และระดับสมาชิก</p>
+      <div id="trackingSection" class="section">
+        <div class="mb-4">
+          <h2 class="text-2xl font-bold text-black">ติดตามพัสดุ</h2>
+          <p class="text-gray-500 text-sm font-medium">ค้นหาสถานะการจัดส่งสินค้าของคุณ</p>
         </div>
+        <div class="w-full bg-white rounded-3xl shadow-md border border-gray-200 overflow-hidden" style="height: 75vh;">
+          <iframe src="https://highclasstrack.netlify.app/" class="w-full h-full border-0"></iframe>
+        </div>
+      </div>
 
+      <div id="privilegeSection" class="section">
+        <div class="mb-6"><h2 class="text-2xl font-bold text-black">สิทธิพิเศษ</h2><p class="text-gray-500 text-sm font-medium">รายละเอียดการสะสมพอยต์และระดับสมาชิก</p></div>
         <div class="bg-black text-white p-6 rounded-3xl shadow-lg mb-8 flex items-center gap-5 relative overflow-hidden">
           <div class="absolute -right-4 -top-6 opacity-10 text-8xl">🛍️</div>
           <div class="text-5xl drop-shadow-md z-10">💎</div>
           <div class="z-10">
             <h3 class="text-lg font-bold tracking-wide">กติกาการสะสมพอยต์</h3>
-            <p class="text-sm text-gray-300 mt-1 leading-relaxed">
-              ยอดสั่งซื้อทุกๆ <span class="text-yellow-400 font-bold text-lg mx-1">200 บาท</span> รับทันที <span class="text-yellow-400 font-bold text-lg mx-1">1 High Point</span>
-            </p>
-            <p class="text-xs text-gray-400 mt-2 bg-gray-800 bg-opacity-50 inline-block px-2 py-1 rounded">
-              * ระบบจะปัดเศษขึ้นให้เสมอ (เช่น 390 บาท = 2 พอยต์)
-            </p>
+            <p class="text-sm text-gray-300 mt-1 leading-relaxed">ยอดสั่งซื้อทุกๆ <span class="text-yellow-400 font-bold text-lg mx-1">200 บาท</span> รับทันที <span class="text-yellow-400 font-bold text-lg mx-1">1 High Point</span></p>
+            <p class="text-xs text-gray-400 mt-2 bg-gray-800 bg-opacity-50 inline-block px-2 py-1 rounded">* ระบบจะปัดเศษขึ้นให้เสมอ (เช่น 390 บาท = 2 พอยต์)</p>
           </div>
         </div>
-
         <h3 class="text-xl font-bold text-black mb-4">ระดับสมาชิก (Rank)</h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4 hover:shadow-md transition">
@@ -186,7 +176,6 @@
             <div><div class="font-bold text-gray-800 text-lg">ผู้สนับสนุนรายใหญ่</div><div class="text-sm font-medium text-gray-500">สะสม 9 - 10+ Point</div></div>
           </div>
         </div>
-        
         <div id="promoRegisterBtn" class="mt-8 text-center">
            <button onclick="openLoginModal(); switchForm('register');" class="bg-black text-white font-bold py-3 px-8 rounded-full hover:bg-gray-800 shadow-lg transition">สมัครสมาชิกฟรี 🚀</button>
         </div>
@@ -205,38 +194,31 @@
         <div class="max-w-md mx-auto bg-white rounded-3xl shadow-lg overflow-hidden border border-gray-100">
           <div class="bg-black p-8 text-center relative">
             <div id="userRank" class="absolute top-4 left-4 text-xs font-bold px-3 py-1 rounded-full text-black bg-white shadow">Rank : </div>
-            
             <div class="relative inline-block mt-2">
               <img id="userPic" class="w-28 h-28 rounded-full border-4 border-white object-cover shadow-lg bg-white" src="https://cdn-icons-png.flaticon.com/512/847/847969.png" alt="Profile">
               <button onclick="document.getElementById('picUpload').click()" class="absolute bottom-0 right-0 bg-white p-2 rounded-full shadow-md hover:bg-gray-100 text-sm border border-gray-200">📷</button>
               <input type="file" id="picUpload" class="hidden" accept="image/*" onchange="previewAndSavePic(event)">
             </div>
-            
             <div class="mt-4 flex items-center justify-center gap-2">
               <h2 id="userNameDisplay" class="text-2xl font-bold text-white tracking-wide">ชื่อลูกค้า</h2>
               <button onclick="toggleEditName()" class="text-gray-400 hover:text-white transition">✏️</button>
             </div>
-            
             <div id="nameEditDiv" class="hidden mt-3 flex justify-center gap-2">
               <input type="text" id="editNameInput" class="text-black font-bold px-3 py-2 rounded-lg text-center w-48 focus:outline-none focus:ring-2 focus:ring-gray-400">
               <button onclick="saveName()" id="saveNameBtn" class="bg-green-500 text-white font-bold px-4 py-2 rounded-lg hover:bg-green-600">บันทึก</button>
             </div>
           </div>
-          
           <div class="p-6 text-center bg-white">
             <p class="text-gray-500 font-medium">High Point คงเหลือ</p>
             <div id="userPoints" class="text-5xl font-black text-black mt-2 mb-6">0</div>
-            
             <div class="border-t border-gray-100 pt-6">
               <h3 class="text-left font-bold text-gray-800 mb-3 text-sm uppercase tracking-wide">สิทธิพิเศษของคุณ</h3>
               <div class="grid grid-cols-2 gap-3">
                 <div class="bg-gray-50 p-3 rounded-xl border border-gray-100 flex flex-col items-center justify-center">
-                  <span class="text-2xl mb-1">🚚</span>
-                  <span class="text-xs font-semibold text-gray-600">ส่วนลดค่าส่ง</span>
+                  <span class="text-2xl mb-1">🚚</span><span class="text-xs font-semibold text-gray-600">ส่วนลดค่าส่ง</span>
                 </div>
                 <div class="bg-gray-50 p-3 rounded-xl border border-gray-100 flex flex-col items-center justify-center">
-                  <span class="text-2xl mb-1">🎁</span>
-                  <span class="text-xs font-semibold text-gray-600">แลกของรางวัล</span>
+                  <span class="text-2xl mb-1">🎁</span><span class="text-xs font-semibold text-gray-600">แลกของรางวัล</span>
                 </div>
               </div>
             </div>
@@ -247,70 +229,54 @@
       <div id="rewardsSection" class="section">
         <h2 class="text-2xl font-bold text-black mb-1">แลกของรางวัล</h2>
         <p class="text-gray-500 text-sm font-medium mb-6">ใช้พอยต์สะสมเพื่อแลกรับสินค้าสุดพิเศษ</p>
-        
         <div id="rewards-grid" class="grid grid-cols-2 md:grid-cols-3 gap-4">
             <div class="col-span-full text-center py-10 text-gray-400 font-medium">กำลังโหลดของรางวัล...</div>
         </div>
-
       </div>
-
     </div>
   </div>
 
   <script>
-    // ⚠️ 1. API ของระบบแต้ม ⚠️
+    // ⚠️ ใส่ลิงก์ API ระบบพอยต์ ที่อัปเดตแล้ว ตรงนี้นะครับ ⚠️
     const POINT_API_URL = 'https://script.google.com/macros/s/AKfycbzRenZgNqtS2qjdjTCnfEuJeABxkWm8HttJrUmrMQ8OOClYh_8CC5VRCyyflH0fauhM/exec'; 
-    // ✅ 2. API ของระบบ Stock
     const STOCK_API_URL = 'https://script.google.com/macros/s/AKfycbzVNx8UdaJFuzdXq4SCPNHoDHWb33-37djx4UBaH2UxwXWNIlEEtRpS3RlgnnuPN7QI/exec';
 
-    let currentUserPhone = '';
-    let currentProfilePic = '';
+    let currentUserPhone = ''; let currentProfilePic = '';
     const DEFAULT_AVATAR = 'https://cdn-icons-png.flaticon.com/512/847/847969.png';
 
-    /* ================= การนำทาง & Sidebar ================= */
-    function toggleSidebar() {
-      document.getElementById('sidebar').classList.toggle('active');
-      document.getElementById('overlay').classList.toggle('active');
+    function initApp() {
+      fetchProducts(); 
+      const savedPhone = localStorage.getItem('hc_phone');
+      const savedPin = localStorage.getItem('hc_pin');
+      if (savedPhone && savedPin) {
+        document.getElementById('loginPhone').value = savedPhone;
+        document.getElementById('loginPin').value = savedPin;
+        loginSystem(true); 
+      }
     }
 
+    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); document.getElementById('overlay').classList.toggle('active'); }
     function navTo(sectionId) {
       document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
       document.getElementById(sectionId).classList.add('active');
       if(document.getElementById('sidebar').classList.contains('active')) toggleSidebar();
     }
 
-    /* ================= ระบบสลับฟอร์ม (Login / Register) ================= */
     function switchForm(formType) {
-      document.getElementById('loginError').classList.add('hidden');
-      document.getElementById('regError').classList.add('hidden');
-      if(formType === 'register') {
-        document.getElementById('formLogin').classList.add('hidden');
-        document.getElementById('formRegister').classList.remove('hidden');
-      } else {
-        document.getElementById('formRegister').classList.add('hidden');
-        document.getElementById('formLogin').classList.remove('hidden');
-      }
+      document.getElementById('loginError').classList.add('hidden'); document.getElementById('regError').classList.add('hidden');
+      if(formType === 'register') { document.getElementById('formLogin').classList.add('hidden'); document.getElementById('formRegister').classList.remove('hidden'); } 
+      else { document.getElementById('formRegister').classList.add('hidden'); document.getElementById('formLogin').classList.remove('hidden'); }
     }
-
-    function openLoginModal() {
-      document.getElementById('loginModal').classList.add('active');
-      switchForm('login');
-    }
-
+    function openLoginModal() { document.getElementById('loginModal').classList.add('active'); switchForm('login'); }
     function closeLoginModal() {
       document.getElementById('loginModal').classList.remove('active');
       document.getElementById('loginPhone').value = ''; document.getElementById('loginPin').value = '';
       document.getElementById('regName').value = ''; document.getElementById('regPhone').value = ''; document.getElementById('regPin').value = '';
     }
 
-    /* ================= สมัครสมาชิก ================= */
     async function registerSystem() {
-      const name = document.getElementById('regName').value.trim();
-      const phone = document.getElementById('regPhone').value.trim();
-      const pin = document.getElementById('regPin').value.trim();
-      const errorText = document.getElementById('regError');
-      const btn = document.getElementById('regBtn');
-
+      const name = document.getElementById('regName').value.trim(); const phone = document.getElementById('regPhone').value.trim(); const pin = document.getElementById('regPin').value.trim();
+      const errorText = document.getElementById('regError'); const btn = document.getElementById('regBtn');
       if(!name || !phone || !pin) { errorText.innerText = 'กรุณากรอกข้อมูลให้ครบถ้วนครับ'; errorText.classList.remove('hidden'); return; }
       if(pin.length !== 4) { errorText.innerText = 'รหัส PIN ต้องเป็นตัวเลข 4 หลักครับ'; errorText.classList.remove('hidden'); return; }
 
@@ -318,93 +284,72 @@
       try {
         const response = await fetch(`${POINT_API_URL}?action=register&phone=${phone}&name=${encodeURIComponent(name)}&pin=${pin}`);
         const data = await response.json();
-        
         if (data.success) {
-          alert('สมัครสมาชิกสำเร็จ! กำลังเข้าสู่ระบบให้ทันทีครับ');
+          alert('สมัครสมาชิกสำเร็จ!');
           document.getElementById('loginPhone').value = phone; document.getElementById('loginPin').value = pin;
           loginSystem();
         } else { errorText.innerText = data.message; errorText.classList.remove('hidden'); }
-      } catch (error) { errorText.innerText = 'เชื่อมต่อไม่สำเร็จ ลองกด Deploy ใหม่นะครับ'; errorText.classList.remove('hidden'); } 
+      } catch (error) { errorText.innerText = 'เชื่อมต่อไม่สำเร็จ'; errorText.classList.remove('hidden'); } 
       finally { btn.innerText = 'ยืนยันการสมัคร'; btn.disabled = false; }
     }
 
-    /* ================= เข้าสู่ระบบ ================= */
-    async function loginSystem() {
+    async function loginSystem(isAutoLogin = false) {
       const phone = document.getElementById('loginPhone').value.trim();
       const pin = document.getElementById('loginPin').value.trim();
       if(!phone) return;
 
-      const btn = document.getElementById('loginBtn');
-      const errorText = document.getElementById('loginError');
-      btn.innerText = 'กำลังตรวจสอบ...'; btn.disabled = true; errorText.classList.add('hidden');
+      const btn = document.getElementById('loginBtn'); const errorText = document.getElementById('loginError');
+      if(!isAutoLogin) { btn.innerText = 'กำลังตรวจสอบ...'; btn.disabled = true; errorText.classList.add('hidden'); }
       
       try {
         const response = await fetch(`${POINT_API_URL}?action=login&phone=${phone}&pin=${pin}`);
         const data = await response.json();
         
         if (data.success) {
-          currentUserPhone = data.phone;
-          currentProfilePic = data.profilePic;
-          
+          currentUserPhone = data.phone; currentProfilePic = data.profilePic;
+          localStorage.setItem('hc_phone', phone); localStorage.setItem('hc_pin', pin);
           closeLoginModal();
-          
-          document.getElementById('navLoginBtn').classList.add('hidden');
-          document.getElementById('navUserBtn').classList.remove('hidden');
+          document.getElementById('navLoginBtn').classList.add('hidden'); document.getElementById('navUserBtn').classList.remove('hidden');
           document.getElementById('navPoints').innerText = data.currentPoints + " Pts";
-          
           document.getElementById('promoRegisterBtn').classList.add('hidden');
-          document.getElementById('menuProfile').classList.remove('hidden');
-          document.getElementById('menuRewards').classList.remove('hidden');
-          document.getElementById('menuLogout').classList.remove('hidden');
-          
-          document.getElementById('userNameDisplay').innerText = data.name;
-          document.getElementById('editNameInput').value = data.name;
-          document.getElementById('userPoints').innerText = data.currentPoints;
+          document.getElementById('menuProfile').classList.remove('hidden'); document.getElementById('menuRewards').classList.remove('hidden'); document.getElementById('menuLogout').classList.remove('hidden');
+          document.getElementById('userNameDisplay').innerText = data.name; document.getElementById('editNameInput').value = data.name; document.getElementById('userPoints').innerText = data.currentPoints;
           
           if (data.profilePic && data.profilePic !== '' && data.profilePic.indexOf('http') === 0) {
-              document.getElementById('userPic').src = data.profilePic;
-              document.getElementById('navPic').src = data.profilePic;
-          } else {
-              document.getElementById('userPic').src = DEFAULT_AVATAR;
-              document.getElementById('navPic').src = DEFAULT_AVATAR;
-          }
+              document.getElementById('userPic').src = data.profilePic; document.getElementById('navPic').src = data.profilePic;
+          } else { document.getElementById('userPic').src = DEFAULT_AVATAR; document.getElementById('navPic').src = DEFAULT_AVATAR; }
           
           const rankElement = document.getElementById('userRank');
-          rankElement.innerText = "Rank : " + data.rank.name;
-          rankElement.style.backgroundColor = data.rank.color;
-          if(data.rank.color === '#C0C0C0' || data.rank.color === '#FFD700') rankElement.style.color = '#000'; 
-          else rankElement.style.color = '#fff';
+          rankElement.innerText = "Rank : " + data.rank.name; rankElement.style.backgroundColor = data.rank.color;
+          if(data.rank.color === '#C0C0C0' || data.rank.color === '#FFD700') rankElement.style.color = '#000'; else rankElement.style.color = '#fff';
           
-          // โหลดของรางวัลอัตโนมัติเมื่อ Login สำเร็จ
           fetchRewards();
-          
-          navTo('profileSection');
-        } else { errorText.innerText = data.message; errorText.classList.remove('hidden'); }
-      } catch (error) { errorText.innerText = 'เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่ครับ'; errorText.classList.remove('hidden'); } 
-      finally { btn.innerText = 'เข้าสู่ระบบ'; btn.disabled = false; }
+          if(!isAutoLogin) navTo('profileSection');
+        } else {
+          if(!isAutoLogin) { errorText.innerText = data.message; errorText.classList.remove('hidden'); }
+          else { localStorage.removeItem('hc_phone'); localStorage.removeItem('hc_pin'); }
+        }
+      } catch (error) { 
+        if(!isAutoLogin) { errorText.innerText = 'ผิดพลาดในการเชื่อมต่อ'; errorText.classList.remove('hidden'); }
+      } finally { if(!isAutoLogin) { btn.innerText = 'เข้าสู่ระบบ'; btn.disabled = false; } }
     }
 
     function logoutSystem() {
       currentUserPhone = '';
-      document.getElementById('navLoginBtn').classList.remove('hidden');
-      document.getElementById('navUserBtn').classList.add('hidden');
+      localStorage.removeItem('hc_phone'); localStorage.removeItem('hc_pin');
+      document.getElementById('navLoginBtn').classList.remove('hidden'); document.getElementById('navUserBtn').classList.add('hidden');
       document.getElementById('promoRegisterBtn').classList.remove('hidden');
-      document.getElementById('menuProfile').classList.add('hidden');
-      document.getElementById('menuRewards').classList.add('hidden');
-      document.getElementById('menuLogout').classList.add('hidden');
+      document.getElementById('menuProfile').classList.add('hidden'); document.getElementById('menuRewards').classList.add('hidden'); document.getElementById('menuLogout').classList.add('hidden');
       navTo('stockSection');
     }
 
-    /* ================= อัปเดตโปรไฟล์ ================= */
     function toggleEditName() {
       const displayDiv = document.getElementById('userNameDisplay'); const editDiv = document.getElementById('nameEditDiv');
       if (editDiv.classList.contains('hidden')) { displayDiv.classList.add('hidden'); editDiv.classList.remove('hidden'); editDiv.classList.add('flex'); } 
       else { displayDiv.classList.remove('hidden'); editDiv.classList.add('hidden'); editDiv.classList.remove('flex'); }
     }
-
     async function saveName() {
-      const newName = document.getElementById('editNameInput').value.trim();
-      if(!newName) return;
+      const newName = document.getElementById('editNameInput').value.trim(); if(!newName) return;
       const btn = document.getElementById('saveNameBtn'); btn.innerText = 'รอ...'; btn.disabled = true;
       try {
         const response = await fetch(POINT_API_URL, { method: 'POST', body: JSON.stringify({ action: 'updateProfile', phone: currentUserPhone, newName: newName, currentPic: currentProfilePic }) });
@@ -413,10 +358,8 @@
       } catch (err) { alert('อัปเดตชื่อไม่สำเร็จ'); }
       btn.innerText = 'บันทึก'; btn.disabled = false;
     }
-
     function previewAndSavePic(event) {
-      const file = event.target.files[0];
-      if (!file) return;
+      const file = event.target.files[0]; if (!file) return;
       const reader = new FileReader();
       reader.onload = async function(e) {
         document.getElementById('userPic').src = e.target.result; document.getElementById('navPic').src = e.target.result;
@@ -429,70 +372,43 @@
       reader.readAsDataURL(file);
     }
 
-    /* ================= ดึงของรางวัล & ตัดพอยต์ ================= */
     let allRewards = [];
     async function fetchRewards() {
       try {
-        const response = await fetch(`${POINT_API_URL}?action=getRewards`);
-        const data = await response.json();
-        if (data.success) {
-          allRewards = data.data;
-          renderRewards();
-        }
-      } catch (error) {
-        document.getElementById('rewards-grid').innerHTML = '<p class="col-span-full text-center text-red-500 py-8">โหลดข้อมูลของรางวัลไม่สำเร็จ</p>';
-      }
+        const response = await fetch(`${POINT_API_URL}?action=getRewards`); const data = await response.json();
+        if (data.success) { allRewards = data.data; renderRewards(); }
+      } catch (error) { document.getElementById('rewards-grid').innerHTML = '<p class="col-span-full text-center text-red-500 py-8">โหลดข้อมูลของรางวัลไม่สำเร็จ</p>'; }
     }
-
     function renderRewards() {
       const grid = document.getElementById('rewards-grid');
-      if (allRewards.length === 0) {
-        grid.innerHTML = '<p class="col-span-full text-center text-gray-500 py-8 font-medium">ยังไม่มีของรางวัลในขณะนี้</p>';
-        return;
-      }
+      if (allRewards.length === 0) { grid.innerHTML = '<p class="col-span-full text-center text-gray-500 py-8 font-medium">ยังไม่มีของรางวัลในขณะนี้</p>'; return; }
       grid.innerHTML = allRewards.map(item => `
         <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 flex flex-col">
-          <img src="${item.image}" class="w-full h-40 object-cover">
-          <div class="p-4 flex flex-col flex-grow text-left">
-            <div class="font-bold text-gray-800">${item.name}</div>
-            <div class="text-red-500 font-black mb-4">${item.points} High Point</div>
-            <button class="mt-auto w-full bg-black text-white font-bold py-2 rounded-lg hover:bg-gray-800 text-sm shadow-md" onclick="redeemReward('${item.name}', ${item.points})">แลกเลย</button>
-          </div>
-        </div>
-      `).join('');
+          <img src="${item.image}" class="w-full h-40 object-cover"><div class="p-4 flex flex-col flex-grow text-left">
+          <div class="font-bold text-gray-800">${item.name}</div><div class="text-red-500 font-black mb-4">${item.points} High Point</div>
+          <button class="mt-auto w-full bg-black text-white font-bold py-2 rounded-lg hover:bg-gray-800 text-sm shadow-md" onclick="redeemReward('${item.name}', ${item.points})">แลกเลย</button></div></div>`).join('');
     }
-
     async function redeemReward(itemName, cost) {
       if(confirm(`ยืนยันการใช้ ${cost} พอยต์ เพื่อแลก ${itemName}?`)) {
         try {
           const response = await fetch(`${POINT_API_URL}?action=redeem&phone=${currentUserPhone}&item=${encodeURIComponent(itemName)}&cost=${cost}`);
           const data = await response.json();
-          if(data.success) { 
-            alert('แลกสำเร็จ! แคปหน้าจอแจ้งแอดมินเลยครับ'); 
-            document.getElementById('userPoints').innerText = data.currentPoints;
-            document.getElementById('navPoints').innerText = data.currentPoints + " Pts";
-          } else { alert(data.message); }
+          if(data.success) { alert('แลกสำเร็จ! แคปหน้าจอแจ้งแอดมินเลยครับ'); document.getElementById('userPoints').innerText = data.currentPoints; document.getElementById('navPoints').innerText = data.currentPoints + " Pts"; } 
+          else { alert(data.message); }
         } catch (error) { alert('ผิดพลาด'); }
       }
     }
 
-    /* ================= ดึงสินค้าพร้อมส่ง ================= */
     let allProducts = []; 
     async function fetchProducts() {
       if (allProducts.length > 0) return; 
       try {
-        const response = await fetch(STOCK_API_URL);
-        allProducts = await response.json(); 
-        document.getElementById('stock-loading').style.display = 'none'; 
-        filterStock('ทั้งหมด', document.querySelector('.category-chip'));
+        const response = await fetch(STOCK_API_URL); allProducts = await response.json(); 
+        document.getElementById('stock-loading').style.display = 'none'; filterStock('ทั้งหมด', document.querySelector('.category-chip'));
       } catch (error) { document.getElementById('stock-loading').innerText = 'ไม่สามารถโหลดข้อมูลสินค้าได้'; }
     }
-
     function filterStock(cat, btnElement) {
-      if(btnElement) {
-        document.querySelectorAll('.category-chip').forEach(el => { el.classList.remove('active'); el.classList.add('inactive'); });
-        btnElement.classList.remove('inactive'); btnElement.classList.add('active');
-      }
+      if(btnElement) { document.querySelectorAll('.category-chip').forEach(el => { el.classList.remove('active'); el.classList.add('inactive'); }); btnElement.classList.remove('inactive'); btnElement.classList.add('active'); }
       const grid = document.getElementById('product-grid');
       const filtered = cat === 'ทั้งหมด' ? allProducts : allProducts.filter(i => i.category === cat);
       if(filtered.length === 0) { grid.innerHTML = '<p class="col-span-full text-center py-8 text-gray-500 font-medium">ไม่มีสินค้าในหมวดหมู่นี้</p>'; return; }
@@ -504,8 +420,7 @@
             <p class="text-gray-500 text-xs mt-1 font-medium">Size: ${item.size}</p>
             <p class="text-black font-black text-lg mt-2 mb-4">฿${item.price}</p>
             <button onclick="window.location.href='https://ig.me/m/highclass.2hand'" class="mt-auto block w-full bg-black hover:bg-gray-800 text-white text-center py-2 rounded-lg font-bold text-sm transition shadow-md">สนใจสินค้า</button>
-          </div>
-        </div>`).join('');
+          </div></div>`).join('');
     }
   </script>
 </body>
