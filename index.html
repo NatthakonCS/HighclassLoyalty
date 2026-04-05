@@ -286,7 +286,7 @@
     let currentUserPhone = ''; let currentProfilePic = '';
     const DEFAULT_AVATAR = 'https://cdn-icons-png.flaticon.com/512/847/847969.png';
 
-    function initApp() {
+        function initApp() {
       fetchProducts(); 
       const savedPhone = localStorage.getItem('hc_phone');
       const savedPin = localStorage.getItem('hc_pin');
@@ -295,6 +295,14 @@
         document.getElementById('loginPin').value = savedPin;
         loginSystem(true); 
       }
+
+      // ✅ เพิ่มระบบอ่านลิงก์แชร์ตรงนี้
+      setTimeout(() => {
+        const hash = window.location.hash.substring(1); // ดึงคำหลังเครื่องหมาย #
+        if (hash && document.getElementById(hash)) {
+          navTo(hash); // สั่งเปิดหน้านั้นทันที
+        }
+      }, 100); // ดีเลย์นิดนึงให้เว็บโหลดโครงสร้างเสร็จก่อน
     }
 
     function toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); document.getElementById('overlay').classList.toggle('active'); }
