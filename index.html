@@ -452,7 +452,7 @@
       }
     }
 
-    async function searchParcel() {
+        async function searchParcel() {
       const input = document.getElementById('trackInput').value.trim();
       const resultDiv = document.getElementById('trackResult');
       const btn = document.getElementById('trackBtn');
@@ -463,10 +463,7 @@
       resultDiv.innerHTML = '<div class="text-center py-6 text-gray-500 font-medium animate-pulse">กำลังค้นหาข้อมูลพัสดุ...</div>';
       
       try {
-        // วิ่งไปขอข้อมูลจากระบบเก่า
         const response = await fetch(`${TRACKING_API_URL}?action=search&name=${encodeURIComponent(input)}`);
-        
-        // รับค่ามาเป็น Text ก่อนตามที่สคริปต์เก่าถูกเขียนไว้
         const rawText = await response.text(); 
         const data = JSON.parse(rawText);
         
@@ -486,6 +483,8 @@
                 <div class="flex items-center gap-2">
                   <span class="font-black text-black text-xl md:text-2xl tracking-wider">${item.tracking || '-'}</span>
                   <button onclick="navigator.clipboard.writeText('${item.tracking}')" class="bg-gray-200 hover:bg-gray-300 text-black px-3 py-1.5 rounded-lg text-xs font-bold transition shadow-sm">คัดลอก</button>
+                  
+                  <button onclick="window.open('https://www.flashexpress.co.th/tracking/?se=' + '${item.tracking}', '_blank')" class="bg-black hover:bg-gray-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition shadow-sm">🚀 เช็คสถานะ</button>
                 </div>
               </div>
             </div>
@@ -499,6 +498,7 @@
       }
       btn.innerText = 'ค้นหา'; btn.disabled = false;
     }
+
 
     function loginTrackAdmin() {
       const pass = document.getElementById('trackAdminPass').value;
