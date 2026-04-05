@@ -108,9 +108,7 @@
       </div>
       <ul class="sidebar-menu">
         <li onclick="navTo('stockSection')">👕 สินค้าพร้อมส่ง</li>
-        
         <li onclick="navTo('trackingSection')">📦 เช็คสถานะพัสดุ</li>
-        
         <li onclick="navTo('privilegeSection')">👑 สิทธิพิเศษ</li> 
         <li onclick="navTo('activitiesSection')">🎉 กิจกรรมพิเศษ</li>
         
@@ -138,11 +136,18 @@
 
       <div id="trackingSection" class="section">
         <div class="mb-4">
-          <h2 class="text-2xl font-bold text-black">ติดตามพัสดุ</h2>
-          <p class="text-gray-500 text-sm font-medium">ค้นหาสถานะการจัดส่งสินค้าของคุณ</p>
+          <h2 class="text-2xl font-bold text-black">ติดตามพัสดุ 📦</h2>
+          <p class="text-gray-500 text-sm font-medium">ค้นหาสถานะและเลขพัสดุของคุณ</p>
         </div>
-        <div class="w-full bg-white rounded-3xl shadow-md border border-gray-200 overflow-hidden" style="height: 75vh;">
-          <iframe src="https://highclasstrack.netlify.app/" class="w-full h-full border-0"></iframe>
+        
+        <div class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 max-w-lg mx-auto mt-6">
+          <div class="flex flex-col gap-4">
+            <input type="text" id="trackInput" class="w-full p-4 border-2 border-gray-200 rounded-2xl font-bold text-center focus:border-black focus:outline-none transition text-lg" placeholder="ใส่เบอร์โทรศัพท์ หรือ ชื่อ เพื่อค้นหา">
+            <button onclick="searchTracking()" id="trackBtn" class="w-full bg-black text-white font-bold py-4 rounded-2xl hover:bg-gray-800 transition shadow-md text-lg">ค้นหาพัสดุ</button>
+          </div>
+          
+          <div id="trackResult" class="mt-6 hidden flex-col gap-3">
+             </div>
         </div>
       </div>
 
@@ -237,9 +242,13 @@
   </div>
 
   <script>
-    // ⚠️ ใส่ลิงก์ API ระบบพอยต์ ที่อัปเดตแล้ว ตรงนี้นะครับ ⚠️
+    // ⚠️ ใส่ลิงก์ API ระบบพอยต์ 
     const POINT_API_URL = 'https://script.google.com/macros/s/AKfycbzRenZgNqtS2qjdjTCnfEuJeABxkWm8HttJrUmrMQ8OOClYh_8CC5VRCyyflH0fauhM/exec'; 
+    // ⚠️ ใส่ลิงก์ API ระบบสต๊อก
     const STOCK_API_URL = 'https://script.google.com/macros/s/AKfycbzVNx8UdaJFuzdXq4SCPNHoDHWb33-37djx4UBaH2UxwXWNIlEEtRpS3RlgnnuPN7QI/exec';
+    
+    // ⚠️ ใส่ลิงก์ API ระบบพัสดุ (Google Sheet ของระบบเช็คพัสดุเดิม) ตรงนี้ ⚠️
+    const TRACKING_API_URL = 'https://script.google.com/macros/s/AKfycbw49xoUL87wdRfP4dDfPwsZ7Y2yKqT8Gjb5BhhMXxlMDk9Z3fLKe6oGqgy_lG_Z3020/exec'; 
 
     let currentUserPhone = ''; let currentProfilePic = '';
     const DEFAULT_AVATAR = 'https://cdn-icons-png.flaticon.com/512/847/847969.png';
@@ -421,6 +430,46 @@
             <p class="text-black font-black text-lg mt-2 mb-4">฿${item.price}</p>
             <button onclick="window.location.href='https://ig.me/m/highclass.2hand'" class="mt-auto block w-full bg-black hover:bg-gray-800 text-white text-center py-2 rounded-lg font-bold text-sm transition shadow-md">สนใจสินค้า</button>
           </div></div>`).join('');
+    }
+
+    // ================= ระบบเช็คพัสดุ (Native) =================
+    async function searchTracking() {
+      const input = document.getElementById('trackInput').value.trim();
+      const resultDiv = document.getElementById('trackResult');
+      const btn = document.getElementById('trackBtn');
+
+      if (!input) { alert('กรุณาใส่เบอร์โทรหรือชื่อเพื่อค้นหาครับ'); return; }
+
+      btn.innerText = 'กำลังค้นหา...'; btn.disabled = true;
+      resultDiv.classList.remove('hidden');
+      resultDiv.innerHTML = '<div class="text-center py-4 text-gray-500 font-medium animate-pulse">กำลังค้นหาข้อมูลพัสดุ...</div>';
+
+      try {
+        const response = await fetch(`${TRACKING_API_URL}?search=${encodeURIComponent(input)}`);
+        const data = await response.json();
+
+        if (data && data.length > 0) {
+          resultDiv.innerHTML = data.map(item => `
+            <div class="bg-gray-50 p-5 rounded-2xl border border-gray-200 text-left relative overflow-hidden">
+              <div class="flex justify-between items-start mb-3">
+                <span class="font-bold text-black text-lg">${item.name || item.ชื่อ}</span>
+                <span class="text-xs px-3 py-1 bg-green-100 text-green-700 rounded-full font-bold shadow-sm">จัดส่งแล้ว</span>
+              </div>
+              <div class="text-sm text-gray-500 mb-1">ขนส่ง: <span class="font-bold text-gray-800">${item.courier || item.ขนส่ง || '-'}</span></div>
+              <div class="text-sm text-gray-500 flex justify-between items-center">
+                <span>เลขพัสดุ: <span class="font-bold text-black text-base tracking-wider">${item.tracking || item.เลขพัสดุ || '-'}</span></span>
+                <button onclick="navigator.clipboard.writeText('${item.tracking || item.เลขพัสดุ}')" class="text-xs bg-gray-200 hover:bg-gray-300 text-black px-2 py-1 rounded transition">คัดลอก</button>
+              </div>
+            </div>
+          `).join('');
+        } else {
+          resultDiv.innerHTML = '<div class="text-center py-4 px-2 bg-red-50 text-red-500 rounded-xl border border-red-100 font-bold">❌ ไม่พบข้อมูลพัสดุของท่าน<br><span class="text-sm font-normal text-red-400 mt-1 block">กรุณาตรวจสอบการสะกดชื่อ หรือเบอร์โทรศัพท์อีกครั้ง</span></div>';
+        }
+      } catch (error) {
+        resultDiv.innerHTML = '<div class="text-center py-4 text-red-500 font-bold">เกิดข้อผิดพลาดในการดึงข้อมูล กรุณาลองใหม่</div>';
+      } finally {
+        btn.innerText = 'ค้นหาพัสดุ'; btn.disabled = false;
+      }
     }
   </script>
 </body>
