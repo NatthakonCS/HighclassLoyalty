@@ -108,9 +108,7 @@
       </div>
       <ul class="sidebar-menu">
         <li onclick="navTo('stockSection')">👕 สินค้าพร้อมส่ง</li>
-        
         <li onclick="navTo('trackingSection')">📦 เช็คสถานะพัสดุ</li>
-        
         <li onclick="navTo('privilegeSection')">👑 สิทธิพิเศษ</li> 
         <li onclick="navTo('activitiesSection')">🎉 กิจกรรมพิเศษ</li>
         
@@ -147,16 +145,14 @@
         
         <div id="trackCustomerBox" class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 max-w-2xl mx-auto">
           <div class="flex flex-col sm:flex-row gap-3">
-            <input type="text" id="trackInput" class="flex-grow p-4 border-2 border-gray-200 rounded-2xl font-bold text-center sm:text-left focus:border-black focus:outline-none transition text-lg" placeholder="ค้นหาด้วย เบอร์โทร หรือ ชื่อ">
+            <input type="text" id="trackInput" class="flex-grow p-4 border-2 border-gray-200 rounded-2xl font-bold text-center sm:text-left focus:border-black focus:outline-none transition text-lg" placeholder="ค้นหาด้วย ชื่อ หรือ เบอร์โทร">
             <button onclick="searchParcel()" id="trackBtn" class="bg-black text-white font-bold py-4 px-8 rounded-2xl hover:bg-gray-800 transition shadow-md text-lg whitespace-nowrap">ค้นหา</button>
           </div>
           
-          <div id="trackResult" class="mt-8 hidden flex-col gap-3">
-             </div>
+          <div id="trackResult" class="mt-8 hidden flex-col gap-3"></div>
         </div>
 
         <div id="trackAdminBox" class="hidden bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 max-w-4xl mx-auto">
-          
           <div id="trackLoginForm" class="max-w-sm mx-auto text-center py-4">
             <h3 class="font-bold text-2xl text-black mb-2 tracking-wide">Admin</h3>
             <p class="text-sm text-gray-500 mb-6">เข้าสู่ระบบจัดการเลขพัสดุ</p>
@@ -175,22 +171,22 @@
                 <thead>
                   <tr class="bg-gray-50 text-gray-600 text-sm border-b border-gray-200">
                     <th class="p-4 font-bold">ชื่อลูกค้า</th>
-                    <th class="p-4 font-bold">เบอร์โทร</th>
-                    <th class="p-4 font-bold">ขนส่ง</th>
                     <th class="p-4 font-bold">เลขพัสดุ</th>
+                    <th class="p-4 font-bold">สินค้า</th>
                   </tr>
                 </thead>
                 <tbody id="trackAdminTableBody">
-                  <tr><td colspan="4" class="text-center p-8 text-gray-500 font-medium">✨ ระบบหลังบ้านพัสดุพร้อมเชื่อมต่อ API แล้ว ✨<br><span class="text-xs text-gray-400 font-normal mt-2 block">(นำโค้ดดึงข้อมูล Google Sheet มาเขียนใส่ได้เลยครับ)</span></td></tr>
+                  <tr><td colspan="3" class="text-center p-8 text-gray-500 font-medium">✨ ระบบหลังบ้านพัสดุเข้าสู่ระบบสำเร็จ ✨<br><span class="text-xs text-gray-400 font-normal mt-2 block">(นำฟังก์ชัน Add Data ของเก่ามาเชื่อมปุ่มบันทึกได้เลย)</span></td></tr>
                 </tbody>
               </table>
             </div>
             <div class="mt-6 text-right">
-              <button onclick="alert('ปุ่มบันทึกทำงาน! (รอเชื่อมต่อกับ Sheet)')" class="bg-green-500 text-white font-bold py-3 px-8 rounded-xl hover:bg-green-600 transition shadow-md">บันทึกข้อมูล</button>
+              <button onclick="alert('ปุ่มบันทึกพร้อมใช้งาน แอดมินสามารถไปอัปเดตผ่าน Google Sheet ได้เลยครับ')" class="bg-green-500 text-white font-bold py-3 px-8 rounded-xl hover:bg-green-600 transition shadow-md">อัปเดตข้อมูล</button>
             </div>
           </div>
         </div>
       </div>
+
       <div id="privilegeSection" class="section">
         <div class="mb-6"><h2 class="text-2xl font-bold text-black">สิทธิพิเศษ</h2><p class="text-gray-500 text-sm font-medium">รายละเอียดการสะสมพอยต์และระดับสมาชิก</p></div>
         <div class="bg-black text-white p-6 rounded-3xl shadow-lg mb-8 flex items-center gap-5 relative overflow-hidden">
@@ -282,12 +278,9 @@
   </div>
 
   <script>
-    // ⚠️ ลิงก์ API ระบบพอยต์ 
+    // ⚠️ ลิงก์ API ทั้งหมด (พี่ใส่ให้ครบแล้ว) ⚠️
     const POINT_API_URL = 'https://script.google.com/macros/s/AKfycbzRenZgNqtS2qjdjTCnfEuJeABxkWm8HttJrUmrMQ8OOClYh_8CC5VRCyyflH0fauhM/exec'; 
-    // ⚠️ ลิงก์ API ระบบสต๊อก
     const STOCK_API_URL = 'https://script.google.com/macros/s/AKfycbzVNx8UdaJFuzdXq4SCPNHoDHWb33-37djx4UBaH2UxwXWNIlEEtRpS3RlgnnuPN7QI/exec';
-    
-    // ⚠️ ใส่ลิงก์ API ระบบเช็คพัสดุ (Google Sheet อันเก่า) ตรงนี้ ⚠️
     const TRACKING_API_URL = 'https://script.google.com/macros/s/AKfycbw49xoUL87wdRfP4dDfPwsZ7Y2yKqT8Gjb5BhhMXxlMDk9Z3fLKe6oGqgy_lG_Z3020/exec'; 
 
     let currentUserPhone = ''; let currentProfilePic = '';
@@ -323,7 +316,7 @@
       document.getElementById('regName').value = ''; document.getElementById('regPhone').value = ''; document.getElementById('regPin').value = '';
     }
 
-    // ================= โค้ดระบบหลัก =================
+    // ================= โค้ดระบบหลัก (เข้าสู่ระบบ, แต้ม, ของรางวัล, สต๊อก) =================
     async function registerSystem() {
       const name = document.getElementById('regName').value.trim(); const phone = document.getElementById('regPhone').value.trim(); const pin = document.getElementById('regPin').value.trim();
       const errorText = document.getElementById('regError'); const btn = document.getElementById('regBtn');
@@ -445,9 +438,7 @@
           </div></div>`).join('');
     }
 
-    // ================= ระบบพัสดุ (ของใหม่!) =================
-    
-    // สลับหน้า ค้นหา / แอดมิน
+    // ================= ระบบเช็คพัสดุ (อัปเดตให้คุยกับสคริปต์เก่า) =================
     function toggleTrackMode() {
       const custBox = document.getElementById('trackCustomerBox');
       const adminBox = document.getElementById('trackAdminBox');
@@ -461,57 +452,62 @@
       }
     }
 
-    // ฟังก์ชันค้นหาพัสดุ (ลูกค้า)
     async function searchParcel() {
       const input = document.getElementById('trackInput').value.trim();
       const resultDiv = document.getElementById('trackResult');
       const btn = document.getElementById('trackBtn');
-      if (!input) return alert('กรุณาใส่เบอร์โทรหรือชื่อเพื่อค้นหาครับ');
+      if (!input) return alert('กรุณาใส่ชื่อเพื่อค้นหาครับ');
       
       btn.innerText = 'กำลังค้นหา...'; btn.disabled = true;
       resultDiv.classList.remove('hidden');
       resultDiv.innerHTML = '<div class="text-center py-6 text-gray-500 font-medium animate-pulse">กำลังค้นหาข้อมูลพัสดุ...</div>';
       
       try {
-        const response = await fetch(`${TRACKING_API_URL}?search=${encodeURIComponent(input)}`);
-        const data = await response.json();
+        // วิ่งไปขอข้อมูลจากระบบเก่า
+        const response = await fetch(`${TRACKING_API_URL}?action=search&name=${encodeURIComponent(input)}`);
         
-        if (data && data.length > 0) {
-          resultDiv.innerHTML = data.map(item => `
+        // รับค่ามาเป็น Text ก่อนตามที่สคริปต์เก่าถูกเขียนไว้
+        const rawText = await response.text(); 
+        const data = JSON.parse(rawText);
+        
+        if (data.status === 'success' && data.data.length > 0) {
+          resultDiv.innerHTML = data.data.map(item => `
             <div class="bg-gray-50 p-6 rounded-2xl border border-gray-200 text-left relative overflow-hidden flex flex-col md:flex-row md:justify-between md:items-center gap-4">
               <div>
                 <div class="flex items-center gap-3 mb-1">
-                  <span class="font-bold text-black text-xl">${item.name || item.ชื่อ || 'ลูกค้า'}</span>
+                  <span class="font-bold text-black text-xl">${item.name || 'ลูกค้า'}</span>
                   <span class="text-xs px-3 py-1 bg-green-100 text-green-700 rounded-full font-bold shadow-sm">จัดส่งแล้ว</span>
                 </div>
-                <div class="text-sm text-gray-500">ขนส่ง: <span class="font-bold text-gray-800">${item.courier || item.ขนส่ง || '-'}</span></div>
+                <div class="text-sm text-gray-500">เวลา: <span class="font-bold text-gray-800">${item.date || '-'}</span></div>
+                <div class="text-sm text-gray-500">สินค้า: <span class="font-bold text-gray-800">${item.product || '-'}</span></div>
               </div>
-              <div class="flex flex-col items-start md:items-end">
+              <div class="flex flex-col items-start md:items-end mt-2 md:mt-0">
                 <div class="text-sm text-gray-500 mb-1">เลขพัสดุ</div>
                 <div class="flex items-center gap-2">
-                  <span class="font-black text-black text-xl tracking-wider">${item.tracking || item.เลขพัสดุ || item.Tracking || '-'}</span>
-                  <button onclick="navigator.clipboard.writeText('${item.tracking || item.เลขพัสดุ || item.Tracking}')" class="bg-gray-200 hover:bg-gray-300 text-black px-3 py-1.5 rounded-lg text-xs font-bold transition shadow-sm">คัดลอก</button>
+                  <span class="font-black text-black text-xl md:text-2xl tracking-wider">${item.tracking || '-'}</span>
+                  <button onclick="navigator.clipboard.writeText('${item.tracking}')" class="bg-gray-200 hover:bg-gray-300 text-black px-3 py-1.5 rounded-lg text-xs font-bold transition shadow-sm">คัดลอก</button>
                 </div>
               </div>
             </div>
           `).join('');
         } else {
-          resultDiv.innerHTML = '<div class="text-center py-6 bg-red-50 text-red-500 rounded-2xl border border-red-100 font-bold">❌ ไม่พบข้อมูลพัสดุ<br><span class="text-sm font-normal mt-1 block text-red-400">กรุณาตรวจสอบชื่อหรือเบอร์โทรศัพท์อีกครั้ง</span></div>';
+          resultDiv.innerHTML = '<div class="text-center py-6 bg-red-50 text-red-500 rounded-2xl border border-red-100 font-bold">❌ ไม่พบข้อมูลพัสดุ<br><span class="text-sm font-normal mt-1 block text-red-400">กรุณาตรวจสอบการสะกดชื่ออีกครั้ง</span></div>';
         }
-      } catch (error) { resultDiv.innerHTML = '<div class="text-center py-4 text-red-500 font-bold">เกิดข้อผิดพลาดในการดึงข้อมูล</div>'; }
+      } catch (error) { 
+        console.error("Tracking Error:", error);
+        resultDiv.innerHTML = '<div class="text-center py-4 text-red-500 font-bold">เกิดข้อผิดพลาดในการดึงข้อมูล</div>'; 
+      }
       btn.innerText = 'ค้นหา'; btn.disabled = false;
     }
 
-    // ฟังก์ชันเข้าสู่ระบบแอดมินพัสดุ
     function loginTrackAdmin() {
       const pass = document.getElementById('trackAdminPass').value;
-      if(pass === '1234') { // 🔑 เปลี่ยนรหัสผ่าน Admin พัสดุตรงนี้ได้เลยครับ!
+      if(pass === 'Admin1234') { 
         document.getElementById('trackLoginForm').classList.add('hidden');
         document.getElementById('trackManageForm').classList.remove('hidden');
       } else { alert('รหัสผ่านไม่ถูกต้อง'); }
     }
 
-    // ฟังก์ชันออกจากระบบแอดมินพัสดุ
     function logoutTrackAdmin() {
       document.getElementById('trackAdminPass').value = '';
       document.getElementById('trackManageForm').classList.add('hidden');
