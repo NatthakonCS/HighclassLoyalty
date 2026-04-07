@@ -134,6 +134,18 @@
           <button onclick="filterStock('กางเกง', this)" class="category-chip inactive">กางเกง</button>
         </div>
         <div id="stock-loading" class="text-center py-10 font-medium text-gray-400">กำลังโหลดรายการสินค้า...</div>
+        <div id="browserWarning" class="hidden mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-xl text-center">
+    <p class="text-xs text-yellow-700 font-medium">
+        ⚠️ ถ้ารูปไม่โหลด ให้กดจุด 3 จุดที่มุมบน <br> แล้วเลือก <b>"เปิดในเบราว์เซอร์"</b> (Open in Browser) นะครับ
+    </p>
+</div>
+
+<script>
+    // ตรวจสอบว่าเปิดใน TikTok/FB/Line หรือไม่
+    const ua = navigator.userAgent || navigator.vendor || window.opera;
+    const isSocial = (ua.indexOf("FBAN") > -1) || (ua.indexOf("FBAV") > -1) || (ua.indexOf("Instagram") > -1) || (ua.indexOf("Line") > -1) || (ua.indexOf("TikTok") > -1);
+    if(isSocial) document.getElementById('browserWarning').classList.remove('hidden');
+</script>
         <div id="product-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6"></div>
       </div>
 
@@ -485,16 +497,33 @@
       if(btnElement) { document.querySelectorAll('.category-chip').forEach(el => { el.classList.remove('active'); el.classList.add('inactive'); }); btnElement.classList.remove('inactive'); btnElement.classList.add('active'); }
       const grid = document.getElementById('product-grid');
       const filtered = cat === 'ทั้งหมด' ? allProducts : allProducts.filter(i => i.category === cat);
+      
       if(filtered.length === 0) { grid.innerHTML = '<p class="col-span-full text-center py-8 text-gray-500 font-medium">ไม่มีสินค้าในหมวดหมู่นี้</p>'; return; }
-      grid.innerHTML = filtered.map(item => `
-        <div class="bg-white rounded-2xl shadow-sm flex flex-col border border-gray-100 overflow-hidden group">
-          <img src="${item.image}" class="w-full h-48 md:h-56 object-cover group-hover:scale-105 transition duration-300">
-          <div class="p-4 flex flex-col flex-grow text-left">
-            <h3 class="font-bold text-gray-800 text-sm md:text-base">${item.name}</h3>
-            <p class="text-gray-500 text-xs mt-1 font-medium">Size: ${item.size}</p>
-            <p class="text-black font-black text-lg mt-2 mb-4">฿${item.price}</p>
-            <button onclick="contactShop('${item.name}', '${item.size}', '${item.price}', '${item.image}')" class="mt-auto block w-full bg-[#00B900] hover:bg-[#009900] text-white text-center py-2 rounded-lg font-bold text-sm transition shadow-md">สั่งซื้อทาง LINE</button>
-          </div></div>`).join('');
+      
+      // ✅ ปรับปรุง: เพิ่มระบบดักจับรูปไม่โหลดสำหรับ TikTok
+      grid.innerHTML = filtered.map((item, index) => {
+        // ล้างช่องว่างใน URL (ถ้ามี) ป้องกันรูปบัค
+        const imageUrl = item.image.trim();
+        
+        return `
+          <div class="bg-white rounded-2xl shadow-sm flex flex-col border border-gray-100 overflow-hidden group">
+            <img src="${imageUrl}" 
+                 ${index < 4 ? '' : 'loading="lazy"'} 
+                 class="w-full h-48 md:h-56 object-cover group-hover:scale-105 transition duration-300 img-loading"
+                 onerror="this.onerror=null; this.src='${imageUrl}?v=${new Date().getTime()}';" 
+                 alt="${item.name}">
+            
+            <div class="p-4 flex flex-col flex-grow text-left">
+              <h3 class="font-bold text-gray-800 text-sm md:text-base">${item.name}</h3>
+              <p class="text-gray-500 text-xs mt-1 font-medium">Size: ${item.size}</p>
+              <p class="text-black font-black text-lg mt-2 mb-4">฿${item.price}</p>
+              <button onclick="contactShop('${item.name}', '${item.size}', '${item.price}', '${imageUrl}')" 
+                      class="mt-auto block w-full bg-[#00B900] hover:bg-[#009900] text-white text-center py-2 rounded-lg font-bold text-sm transition shadow-md">
+                สั่งซื้อทาง LINE
+              </button>
+            </div>
+          </div>`;
+      }).join('');
     }
 
       // ================= ระบบก๊อปปี้ข้อความ + เด้งเข้าแอป LINE =================
