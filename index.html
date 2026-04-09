@@ -45,7 +45,12 @@
         <div class="z-10">
             <button id="navLoginBtn" onclick="openLoginModal()" class="text-xs md:text-sm font-bold bg-white text-black px-4 py-1.5 rounded-full hover:bg-gray-200 transition shadow">เข้าสู่ระบบ</button>
             <div id="navUserBtn" class="hidden flex items-center gap-2 cursor-pointer hover:opacity-80 transition" onclick="navTo('profileSection')">
-                <span id="navPoints" class="text-xs md:text-sm font-bold text-yellow-400 drop-shadow">0 Pts</span>
+                
+                <div class="flex items-center">
+                    <span id="navPoints" class="text-sm md:text-base font-bold text-white drop-shadow">0</span>
+                    <img src="h-icon.png" class="h-4 w-auto ml-1" alt="Pts">
+                </div>
+                
                 <img id="navPic" src="" class="w-8 h-8 rounded-full border-2 border-white object-cover bg-white">
             </div>
         </div>
@@ -285,8 +290,13 @@
             </div>
           </div>
           <div class="p-6 text-center bg-white">
-            <p class="text-gray-500 font-medium">High Point คงเหลือ</p>
-            <div id="userPoints" class="text-5xl font-black text-black mt-2 mb-6">0</div>
+            <p class="text-gray-500 font-medium">คะแนนคงเหลือ</p>
+            
+            <div class="flex justify-center items-center gap-2 mt-2 mb-6">
+                <div id="userPoints" class="text-5xl font-black text-black">0</div>
+                <img src="h-icon.png" class="h-10 w-auto" alt="H">
+            </div>
+            
             <div class="border-t border-gray-100 pt-6">
               <h3 class="text-left font-bold text-gray-800 mb-3 text-sm uppercase tracking-wide">สิทธิพิเศษของคุณ</h3>
               <div class="grid grid-cols-2 gap-3">
@@ -314,9 +324,9 @@
 
   <script>
     // ⚠️ ลิงก์ API ทั้ง 3 ตัว
-    const POINT_API_URL = 'https://script.google.com/macros/s/AKfycbzBy1bRIJ0TdkwbsmLY_Y7cXRFYrMGqD98mXWqW0nCrURPV7g4AidxdpJ44nGPb-3Yk/exec'; 
-    const STOCK_API_URL = 'https://script.google.com/macros/s/AKfycbzVNx8UdaJFuzdXq4SCPNHoDHWb33-37djx4UBaH2UxwXWNIlEEtRpS3RlgnnuPN7QI/exec';
-    const TRACKING_API_URL = 'https://script.google.com/macros/s/AKfycbw49xoUL87wdRfP4dDfPwsZ7Y2yKqT8Gjb5BhhMXxlMDk9Z3fLKe6oGqgy_lG_Z3020/exec'; 
+    const POINT_API_URL = "https://script.google.com/macros/s/AKfycbzBy1bRIJ0TdkwbsmLY_Y7cXRFYrMGqD98mXWqW0nCrURPV7g4AidxdpJ44nGPb-3Yk/exec"; 
+    const STOCK_API_URL = "https://script.google.com/macros/s/AKfycbzVNx8UdaJFuzdXq4SCPNHoDHWb33-37djx4UBaH2UxwXWNIlEEtRpS3RlgnnuPN7QI/exec";
+    const TRACKING_API_URL = "https://script.google.com/macros/s/AKfycbw49xoUL87wdRfP4dDfPwsZ7Y2yKqT8Gjb5BhhMXxlMDk9Z3fLKe6oGqgy_lG_Z3020/exec";
 
     let currentUserPhone = ''; let currentProfilePic = '';
     const DEFAULT_AVATAR = 'https://cdn-icons-png.flaticon.com/512/847/847969.png';
@@ -393,7 +403,10 @@
           localStorage.setItem('hc_phone', phone); localStorage.setItem('hc_pin', pin);
           closeLoginModal();
           document.getElementById('navLoginBtn').classList.add('hidden'); document.getElementById('navUserBtn').classList.remove('hidden');
-          document.getElementById('navPoints').innerText = data.currentPoints + " Pts";
+          
+          // ✅ อัปเดตตัวเลขเพียวๆ ไม่มีคำว่า Pts แล้ว เพราะเราใช้ไอคอนแทน
+          document.getElementById('navPoints').innerText = data.currentPoints;
+          
           document.getElementById('promoRegisterBtn').classList.add('hidden');
           document.getElementById('menuProfile').classList.remove('hidden'); document.getElementById('menuRewards').classList.remove('hidden'); document.getElementById('menuLogout').classList.remove('hidden');
           document.getElementById('userNameDisplay').innerText = data.name; document.getElementById('editNameInput').value = data.name; document.getElementById('userPoints').innerText = data.currentPoints;
@@ -470,7 +483,12 @@
       grid.innerHTML = allRewards.map(item => `
         <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 flex flex-col">
           <img src="${item.image}" class="w-full h-40 object-cover"><div class="p-4 flex flex-col flex-grow text-left">
-          <div class="font-bold text-gray-800">${item.name}</div><div class="text-red-500 font-black mb-4">${item.points} High Point</div>
+          <div class="font-bold text-gray-800">${item.name}</div>
+          
+          <div class="text-black font-black text-lg mb-4 mt-1 flex items-center">
+            ${item.points} <img src="h-icon.png" class="h-5 w-auto ml-1" alt="H">
+          </div>
+          
           <button class="mt-auto w-full bg-black text-white font-bold py-2 rounded-lg hover:bg-gray-800 text-sm shadow-md" onclick="redeemReward('${item.name}', ${item.points})">แลกเลย</button></div></div>`).join('');
     }
     async function redeemReward(itemName, cost) {
@@ -478,13 +496,18 @@
         try {
           const response = await fetch(`${POINT_API_URL}?action=redeem&phone=${currentUserPhone}&item=${encodeURIComponent(itemName)}&cost=${cost}`);
           const data = await response.json();
-          if(data.success) { alert('แลกสำเร็จ! แคปหน้าจอแจ้งแอดมินเลยครับ'); document.getElementById('userPoints').innerText = data.currentPoints; document.getElementById('navPoints').innerText = data.currentPoints + " Pts"; } 
+          if(data.success) { 
+              alert('แลกสำเร็จ! แคปหน้าจอแจ้งแอดมินเลยครับ'); 
+              document.getElementById('userPoints').innerText = data.currentPoints; 
+              // ✅ อัปเดตตัวเลขเพียวๆ ไม่มีคำว่า Pts แล้ว
+              document.getElementById('navPoints').innerText = data.currentPoints; 
+          } 
           else { alert(data.message); }
         } catch (error) { alert('ผิดพลาด'); }
       }
     }
 
-    // 6. ระบบสต๊อกสินค้า (อัปเดตให้กดสนใจสินค้าแล้วเด้งไปหน้าแชท IG)
+    // 6. ระบบสต๊อกสินค้า
     let allProducts = []; 
     async function fetchProducts() {
       if (allProducts.length > 0) return; 
@@ -500,9 +523,7 @@
       
       if(filtered.length === 0) { grid.innerHTML = '<p class="col-span-full text-center py-8 text-gray-500 font-medium">ไม่มีสินค้าในหมวดหมู่นี้</p>'; return; }
       
-      // ✅ ปรับปรุง: เพิ่มระบบดักจับรูปไม่โหลดสำหรับ TikTok
       grid.innerHTML = filtered.map((item, index) => {
-        // ล้างช่องว่างใน URL (ถ้ามี) ป้องกันรูปบัค
         const imageUrl = item.image.trim();
         
         return `
@@ -526,12 +547,8 @@
       }).join('');
     }
 
-      // ================= ระบบก๊อปปี้ข้อความ + เด้งเข้าแอป LINE =================
     function contactShop(productName, productSize, productPrice, productImage) {
-        // 1. เตรียมข้อความแพทเทิร์นเดิมของเถ้าแก่
         const textToCopy = `สนใจสินค้าชิ้นนี้ครับ/ค่ะ\n👕 ชื่อ: ${productName}\n📏 ไซส์: ${productSize}\n💰 ราคา: ฿${productPrice}\n🖼 ดูรูปสินค้า: ${productImage}`;
-        
-        // 2. ก๊อปปี้ลงคลิปบอร์ด
         const el = document.createElement('textarea');
         el.value = textToCopy;
         document.body.appendChild(el);
@@ -543,13 +560,11 @@
             alert('ระบบกำลังพาไปที่ LINE ร้านครับ');
         }
         document.body.removeChild(el);
-
-        // 3. ระบบพาเข้า LINE Official Account
         window.location.href = 'https://line.me/ti/p/@709qllnp';
     }
 
 
-    // ================= 7. ระบบเช็คพัสดุ (ของเถ้าแก่ฟิว) =================
+    // ================= 7. ระบบเช็คพัสดุ =================
     function toggleTrackMode() {
       const custBox = document.getElementById('trackCustomerBox');
       const adminBox = document.getElementById('trackAdminBox');
