@@ -6,7 +6,7 @@
     <title>อัปเดตพอยต์ - HighClass</title>
     <style>
         body { font-family: sans-serif; padding: 20px; max-width: 600px; margin: 0 auto; }
-        textarea, input { width: 100%; margin-bottom: 15px; padding: 10px; font-size: 16px; }
+        textarea, input { width: 100%; margin-bottom: 15px; padding: 10px; font-size: 16px; box-sizing: border-box; }
         button { padding: 15px; font-size: 16px; width: 100%; background-color: #000; color: #fff; border: none; cursor: pointer; }
         #status { margin-top: 20px; font-weight: bold; color: blue; }
     </style>
@@ -18,7 +18,10 @@
     <label>1. ใส่รหัสผ่านแอดมิน:</label>
     <input type="password" id="adminPass" placeholder="กรอกรหัสผ่านเพื่อยืนยันตัวตน">
 
-    <label>2. วางข้อความที่ก็อปมา:</label>
+    <label>2. ใส่จำนวนพอยต์ที่ต้องการบวก:</label>
+    <input type="number" id="pointValue" value="1" placeholder="เช่น 1 หรือ 2">
+
+    <label>3. วางข้อความที่ก็อปมา:</label>
     <textarea id="rawData" rows="10" placeholder="วางข้อความรายชื่อและเบอร์โทรตรงนี้..."></textarea>
     
     <button onclick="processAndSend()">ส่งข้อมูลอัปเดตพอยต์</button>
@@ -28,6 +31,7 @@
     async function processAndSend() {
         const rawText = document.getElementById('rawData').value;
         const password = document.getElementById('adminPass').value;
+        const pointValue = document.getElementById('pointValue').value; // ดึงค่าพอยต์
         const statusText = document.getElementById('status');
         
         if(!password) {
@@ -52,8 +56,8 @@
         try {
             const response = await fetch(scriptUrl, {
                 method: 'POST',
-                // สังเกตตรงนี้: เราส่งทั้งเบอร์โทร และ รหัสผ่าน ไปให้หลังบ้านตรวจ
-                body: JSON.stringify({ phones: cleanPhones, password: password }),
+                // ส่งค่า points เข้าไปด้วย
+                body: JSON.stringify({ phones: cleanPhones, password: password, points: pointValue }),
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' }
             });
 
@@ -61,7 +65,7 @@
             if(result.success) {
                 statusText.innerText = result.message;
                 statusText.style.color = "green";
-                document.getElementById('rawData').value = ''; // เคลียร์ช่องข้อความเมื่อเสร็จ
+                document.getElementById('rawData').value = ''; 
             } else {
                 statusText.innerText = "เกิดข้อผิดพลาด: " + result.message;
                 statusText.style.color = "red";
