@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>อัปเดตพอยต์ - HighClass</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; max-width: 600px; margin: 0 auto; }
+        textarea, input { width: 100%; margin-bottom: 15px; padding: 10px; font-size: 16px; }
+        button { padding: 15px; font-size: 16px; width: 100%; background-color: #000; color: #fff; border: none; cursor: pointer; }
+        #status { margin-top: 20px; font-weight: bold; color: blue; }
+    </style>
+</head>
+<body>
+
+    <h2>ระบบอัปเดตพอยต์ลูกค้า (แอดมินเท่านั้น)</h2>
+    
+    <label>1. ใส่รหัสผ่านแอดมิน:</label>
+    <input type="password" id="adminPass" placeholder="กรอกรหัสผ่านเพื่อยืนยันตัวตน">
+
+    <label>2. วางข้อความที่ก็อปมา:</label>
+    <textarea id="rawData" rows="10" placeholder="วางข้อความรายชื่อและเบอร์โทรตรงนี้..."></textarea>
+    
+    <button onclick="processAndSend()">ส่งข้อมูลอัปเดตพอยต์</button>
+    <p id="status"></p>
+
+    <script>
+    async function processAndSend() {
+        const rawText = document.getElementById('rawData').value;
+        const password = document.getElementById('adminPass').value;
+        const statusText = document.getElementById('status');
+        
+        if(!password) {
+            alert("กรุณาใส่รหัสผ่านแอดมินก่อน!");
+            return;
+        }
+
+        const phoneRegex = /(0\d{2}-?\d{3}-?\d{4})/g; 
+        let matchedPhones = rawText.match(phoneRegex);
+
+        if (!matchedPhones) {
+            statusText.innerText = "ไม่พบเบอร์โทรศัพท์ในข้อความ";
+            return;
+        }
+
+        let cleanPhones = matchedPhones.map(phone => phone.replace(/-/g, ''));
+        statusText.innerText = `เจอ ${cleanPhones.length} เบอร์ กำลังตรวจสอบรหัสผ่านและอัปเดต...`;
+
+        // !!! เอา URL ของ Apps Script มาวางแทนที่ตรงนี้ !!!
+        const scriptUrl = 'https://script.google.com/macros/s/AKfycbwEiN17UuCLsmPgtY_H1x4xyuvVsE9e4uMTXJtHzhPytqtvOZitmsD_icdRlmBG8Rsb7Q/exec'; 
+
+        try {
+            const response = await fetch(scriptUrl, {
+                method: 'POST',
+                // สังเกตตรงนี้: เราส่งทั้งเบอร์โทร และ รหัสผ่าน ไปให้หลังบ้านตรวจ
+                body: JSON.stringify({ phones: cleanPhones, password: password }),
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+            });
+
+            const result = await response.json();
+            if(result.success) {
+                statusText.innerText = result.message;
+                statusText.style.color = "green";
+                document.getElementById('rawData').value = ''; // เคลียร์ช่องข้อความเมื่อเสร็จ
+            } else {
+                statusText.innerText = "เกิดข้อผิดพลาด: " + result.message;
+                statusText.style.color = "red";
+            }
+        } catch (error) {
+            statusText.innerText = "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้";
+            statusText.style.color = "red";
+            console.error(error);
+        }
+    }
+    </script>
+</body>
+</html>
