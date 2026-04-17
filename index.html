@@ -404,7 +404,6 @@
           closeLoginModal();
           document.getElementById('navLoginBtn').classList.add('hidden'); document.getElementById('navUserBtn').classList.remove('hidden');
           
-          // ✅ อัปเดตตัวเลขเพียวๆ ไม่มีคำว่า Pts แล้ว เพราะเราใช้ไอคอนแทน
           document.getElementById('navPoints').innerText = data.currentPoints;
           
           document.getElementById('promoRegisterBtn').classList.add('hidden');
@@ -486,7 +485,7 @@
           <div class="font-bold text-gray-800">${item.name}</div>
           
           <div class="text-black font-black text-lg mb-4 mt-1 flex items-center">
-            ${item.points} <img src="h-icon.png" class="h-5 w-auto ml-1" alt="H">
+            ${item.points} <img src="h-icon.png" class="h-5 w-auto ml-1 object-contain" alt="H">
           </div>
           
           <button class="mt-auto w-full bg-black text-white font-bold py-2 rounded-lg hover:bg-gray-800 text-sm shadow-md" onclick="redeemReward('${item.name}', ${item.points})">แลกเลย</button></div></div>`).join('');
@@ -499,7 +498,6 @@
           if(data.success) { 
               alert('แลกสำเร็จ! แคปหน้าจอแจ้งแอดมินเลยครับ'); 
               document.getElementById('userPoints').innerText = data.currentPoints; 
-              // ✅ อัปเดตตัวเลขเพียวๆ ไม่มีคำว่า Pts แล้ว
               document.getElementById('navPoints').innerText = data.currentPoints; 
           } 
           else { alert(data.message); }
@@ -507,7 +505,7 @@
       }
     }
 
-    // 6. ระบบสต๊อกสินค้า
+    // 6. ระบบสต๊อกสินค้า (อัปเดตแก้รูปลิงก์ Google Drive)
     let allProducts = []; 
     async function fetchProducts() {
       if (allProducts.length > 0) return; 
@@ -516,7 +514,8 @@
         document.getElementById('stock-loading').style.display = 'none'; filterStock('ทั้งหมด', document.querySelector('.category-chip'));
       } catch (error) { document.getElementById('stock-loading').innerText = 'ไม่สามารถโหลดข้อมูลสินค้าได้'; }
     }
-        function filterStock(cat, btnElement) {
+    
+    function filterStock(cat, btnElement) {
       if(btnElement) { document.querySelectorAll('.category-chip').forEach(el => { el.classList.remove('active'); el.classList.add('inactive'); }); btnElement.classList.remove('inactive'); btnElement.classList.add('active'); }
       const grid = document.getElementById('product-grid');
       const filtered = cat === 'ทั้งหมด' ? allProducts : allProducts.filter(i => i.category === cat);
@@ -524,14 +523,18 @@
       if(filtered.length === 0) { grid.innerHTML = '<p class="col-span-full text-center py-8 text-gray-500 font-medium">ไม่มีสินค้าในหมวดหมู่นี้</p>'; return; }
       
       grid.innerHTML = filtered.map((item, index) => {
-        const imageUrl = item.image.trim();
+        let imageUrl = item.image ? item.image.trim() : '';
+        
+        // ✅ ท่าไม้ตาย! แปลงลิงก์ Google Drive ให้อ่านได้ทุกเครื่อง (แก้จอดำใน iPad/TikTok)
+        const driveMatch = imageUrl.match(/[-\w]{25,}/);
+        if (imageUrl.includes('drive.google.com') && driveMatch) {
+            imageUrl = `https://lh3.googleusercontent.com/d/${driveMatch[0]}`;
+        }
         
         return `
           <div class="bg-white rounded-2xl shadow-sm flex flex-col border border-gray-100 overflow-hidden group">
             <img src="${imageUrl}" 
-                 ${index < 4 ? '' : 'loading="lazy"'} 
                  class="w-full h-48 md:h-56 object-cover group-hover:scale-105 transition duration-300 img-loading"
-                 onerror="this.onerror=null; this.src='${imageUrl}?v=${new Date().getTime()}';" 
                  alt="${item.name}">
             
             <div class="p-4 flex flex-col flex-grow text-left">
