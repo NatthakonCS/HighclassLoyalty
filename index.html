@@ -432,6 +432,7 @@
           document.getElementById('menuLogout').classList.remove('hidden');
           document.getElementById('userNameDisplay').innerText = d.name;
           document.getElementById('userPoints').innerText = d.currentPoints;
+          document.getElementById('navPoints').innerText = d.currentPoints;
           document.getElementById('userRank').innerText = "Rank : " + d.rank.name; 
           document.getElementById('userRank').style.backgroundColor = d.rank.color;
           if(d.rank.color === '#C0C0C0' || d.rank.color === '#FFD700') document.getElementById('userRank').style.color = '#000'; else document.getElementById('userRank').style.color = '#fff';
@@ -456,8 +457,7 @@
          try {
            allProducts = JSON.parse(cachedData);
            document.getElementById('stock-loading').style.display = 'none';
-           document.getElementById('userPoints').innerText = d.currentPoints;
-           document.getElementById('navPoints').innerText = d.currentPoints;
+           
            
            const activeBtn = document.querySelector('.category-chip.active');
            const currentCat = activeBtn ? activeBtn.innerText.trim() : 'ทั้งหมด';
