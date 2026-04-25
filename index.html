@@ -456,6 +456,8 @@
          try {
            allProducts = JSON.parse(cachedData);
            document.getElementById('stock-loading').style.display = 'none';
+           document.getElementById('userPoints').innerText = d.currentPoints;
+           document.getElementById('navPoints').innerText = d.currentPoints;
            
            const activeBtn = document.querySelector('.category-chip.active');
            const currentCat = activeBtn ? activeBtn.innerText.trim() : 'ทั้งหมด';
@@ -758,43 +760,7 @@
         }
     }
 
-    function loginTrackAdmin() {
-      const pass = document.getElementById('trackAdminPass').value;
-      fetch(`${TRACKING_API_URL}?action=login&pass=${pass}`)
-          .then(res => res.text())
-          .then(text => {
-              const data = JSON.parse(text);
-              if(data.status == 'success') {
-                  document.getElementById('trackLoginForm').classList.add('hidden');
-                  document.getElementById('trackManageForm').classList.remove('hidden');
-              } else { alert("รหัสผิด"); }
-          });
-    }
-
-    function logoutTrackAdmin() {
-      document.getElementById('trackAdminPass').value = '';
-      document.getElementById('trackManageForm').classList.add('hidden');
-      document.getElementById('trackLoginForm').classList.remove('hidden');
-    }
-
-    function addData() {
-        let n = document.getElementById('addName').value;
-        let t = document.getElementById('addTrack').value;
-        let p = document.getElementById('addProd').value;
-        let pass = document.getElementById('trackAdminPass').value;
-        
-        fetch(`${TRACKING_API_URL}?action=add&name=${n}&track=${t}&prod=${p}&pass=${pass}`)
-            .then(res => res.text())
-            .then(text => {
-               const data = JSON.parse(text);
-               alert(data.msg);
-               if(data.status === 'success'){
-                    document.getElementById('addName').value = "";
-                    document.getElementById('addTrack').value = "";
-                    document.getElementById('addProd').value = "";
-               }
-            });
-    }
+    
   </script>
 </body>
 </html>
